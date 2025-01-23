@@ -12,6 +12,17 @@
 		931BD5692D4158BF00B06201 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931BD5652D4158BF00B06201 /* ViewController.swift */; };
 		931BD56A2D4158BF00B06201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 931BD55E2D4158BF00B06201 /* Assets.xcassets */; };
 		931BD56C2D4158BF00B06201 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 931BD5612D4158BF00B06201 /* LaunchScreen.storyboard */; };
+		934A700B2D41B7640079067B /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A700A2D41B75E0079067B /* NetworkError.swift */; };
+		934A700D2D41B7990079067B /* MoviesListDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A700C2D41B7940079067B /* MoviesListDTO.swift */; };
+		934A700F2D41B9E10079067B /* AlamoNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A700E2D41B9D20079067B /* AlamoNetworking.swift */; };
+		934A70112D41BB730079067B /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70102D41BB730079067B /* Endpoints.swift */; };
+		934A70132D41BCB30079067B /* APIHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70122D41BCAE0079067B /* APIHost.swift */; };
+		934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70142D41BD390079067B /* EndpointInstructions.swift */; };
+		934A70182D41BFC60079067B /* AvailableLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70172D41BFC60079067B /* AvailableLanguages.swift */; };
+		934A701A2D41BFDF0079067B /* SortMoviesOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70192D41BFDF0079067B /* SortMoviesOption.swift */; };
+		934A701D2D41CEC90079067B /* MoviesAPIHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A701C2D41CEC90079067B /* MoviesAPIHeader.swift */; };
+		934A70202D41CF1E0079067B /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A701F2D41CF1E0079067B /* Endpoint.swift */; };
+		934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70212D41CF570079067B /* NetworkRequestBodyConvertible.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +36,17 @@
 		931BD55F2D4158BF00B06201 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		931BD5602D4158BF00B06201 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		931BD5652D4158BF00B06201 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		934A700A2D41B75E0079067B /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		934A700C2D41B7940079067B /* MoviesListDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesListDTO.swift; sourceTree = "<group>"; };
+		934A700E2D41B9D20079067B /* AlamoNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamoNetworking.swift; sourceTree = "<group>"; };
+		934A70102D41BB730079067B /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
+		934A70122D41BCAE0079067B /* APIHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIHost.swift; sourceTree = "<group>"; };
+		934A70142D41BD390079067B /* EndpointInstructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointInstructions.swift; sourceTree = "<group>"; };
+		934A70172D41BFC60079067B /* AvailableLanguages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLanguages.swift; sourceTree = "<group>"; };
+		934A70192D41BFDF0079067B /* SortMoviesOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortMoviesOption.swift; sourceTree = "<group>"; };
+		934A701C2D41CEC90079067B /* MoviesAPIHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesAPIHeader.swift; sourceTree = "<group>"; };
+		934A701F2D41CF1E0079067B /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		934A70212D41CF570079067B /* NetworkRequestBodyConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestBodyConvertible.swift; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,11 +110,46 @@
 			path = Movies;
 			sourceTree = "<group>";
 		};
+		934A70092D41B7550079067B /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				934A700A2D41B75E0079067B /* NetworkError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		934A70162D41BFB60079067B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				934A70192D41BFDF0079067B /* SortMoviesOption.swift */,
+				934A70172D41BFC60079067B /* AvailableLanguages.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		934A701B2D41CEC40079067B /* Const */ = {
+			isa = PBXGroup;
+			children = (
+				934A701C2D41CEC90079067B /* MoviesAPIHeader.swift */,
+			);
+			path = Const;
+			sourceTree = "<group>";
+		};
+		934A701E2D41CF100079067B /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				934A70212D41CF570079067B /* NetworkRequestBodyConvertible.swift */,
+				934A701F2D41CF1E0079067B /* Endpoint.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		937391B52D41A7DD0036EDED /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				934A70092D41B7550079067B /* Errors */,
 				937391C02D41A8DE0036EDED /* Models */,
-				937391BF2D41A8D80036EDED /* Endpoints */,
+				937391BF2D41A8D80036EDED /* EndpointDescription */,
 				937391BE2D41A8D30036EDED /* API */,
 			);
 			path = Networking;
@@ -169,20 +226,28 @@
 		937391BE2D41A8D30036EDED /* API */ = {
 			isa = PBXGroup;
 			children = (
+				934A70122D41BCAE0079067B /* APIHost.swift */,
+				934A700E2D41B9D20079067B /* AlamoNetworking.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
 		};
-		937391BF2D41A8D80036EDED /* Endpoints */ = {
+		937391BF2D41A8D80036EDED /* EndpointDescription */ = {
 			isa = PBXGroup;
 			children = (
+				934A701E2D41CF100079067B /* Protocols */,
+				934A701B2D41CEC40079067B /* Const */,
+				934A70162D41BFB60079067B /* Helpers */,
+				934A70142D41BD390079067B /* EndpointInstructions.swift */,
+				934A70102D41BB730079067B /* Endpoints.swift */,
 			);
-			path = Endpoints;
+			path = EndpointDescription;
 			sourceTree = "<group>";
 		};
 		937391C02D41A8DE0036EDED /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				934A700C2D41B7940079067B /* MoviesListDTO.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -332,8 +397,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934A700D2D41B7990079067B /* MoviesListDTO.swift in Sources */,
+				934A701A2D41BFDF0079067B /* SortMoviesOption.swift in Sources */,
+				934A700B2D41B7640079067B /* NetworkError.swift in Sources */,
 				931BD5672D4158BF00B06201 /* AppDelegate.swift in Sources */,
 				931BD5692D4158BF00B06201 /* ViewController.swift in Sources */,
+				934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */,
+				934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */,
+				934A701D2D41CEC90079067B /* MoviesAPIHeader.swift in Sources */,
+				934A70182D41BFC60079067B /* AvailableLanguages.swift in Sources */,
+				934A70112D41BB730079067B /* Endpoints.swift in Sources */,
+				934A70132D41BCB30079067B /* APIHost.swift in Sources */,
+				934A70202D41CF1E0079067B /* Endpoint.swift in Sources */,
+				934A700F2D41B9E10079067B /* AlamoNetworking.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
