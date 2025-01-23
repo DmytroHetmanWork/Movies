@@ -7,9 +7,13 @@
 
 import UIKit
 
+protocol MoviesListView: AnyObject {
+    var moviesTableView: UITableView { get }
+}
+
 final class MoviesListViewController: UIViewController {
     
-    private let moviesTableView: UITableView = {
+    let moviesTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
@@ -42,7 +46,6 @@ final class MoviesListViewController: UIViewController {
         
         setupUI()
         setupTableView()
-        setupDataSource()
     }
 
     private func setupUI() {
@@ -73,9 +76,9 @@ final class MoviesListViewController: UIViewController {
     private func setupTableView() {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
     }
-
-    private func setupDataSource() {
-        dataSource = MoviesDataSource(tableView: moviesTableView)
-    }
+    
 }
 
+extension MoviesListViewController: MoviesListView {
+    
+}

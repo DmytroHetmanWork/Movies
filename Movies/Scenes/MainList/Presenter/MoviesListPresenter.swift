@@ -17,4 +17,12 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         case movies
     }
     
+    weak var moviesListView: MoviesListView!
+    
+    private var dataSource: MoviesDataSource!
+    
+    init() {
+        dataSource = MoviesDataSource(tableView: moviesListView.moviesTableView)
+    }
+    
 }
