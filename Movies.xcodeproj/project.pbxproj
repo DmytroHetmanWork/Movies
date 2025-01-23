@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		4E2C7C141B223261164967B4 /* Pods_Movies.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1793B37CBD526014446D96DC /* Pods_Movies.framework */; };
 		931BD5672D4158BF00B06201 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931BD55D2D4158BF00B06201 /* AppDelegate.swift */; };
-		931BD5692D4158BF00B06201 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931BD5652D4158BF00B06201 /* ViewController.swift */; };
+		931BD5692D4158BF00B06201 /* MoviesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931BD5652D4158BF00B06201 /* MoviesListViewController.swift */; };
 		931BD56A2D4158BF00B06201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 931BD55E2D4158BF00B06201 /* Assets.xcassets */; };
 		931BD56C2D4158BF00B06201 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 931BD5612D4158BF00B06201 /* LaunchScreen.storyboard */; };
 		934A700B2D41B7640079067B /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A700A2D41B75E0079067B /* NetworkError.swift */; };
@@ -23,6 +23,9 @@
 		934A701D2D41CEC90079067B /* MoviesAPIHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A701C2D41CEC90079067B /* MoviesAPIHeader.swift */; };
 		934A70202D41CF1E0079067B /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A701F2D41CF1E0079067B /* Endpoint.swift */; };
 		934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70212D41CF570079067B /* NetworkRequestBodyConvertible.swift */; };
+		934A70242D41EB4A0079067B /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70232D41EB470079067B /* Router.swift */; };
+		934A70282D41EBB10079067B /* AssemblyModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70272D41EBB10079067B /* AssemblyModelBuilder.swift */; };
+		934A702A2D41F1610079067B /* MoviesListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70292D41F1590079067B /* MoviesListPresenter.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +38,7 @@
 		931BD55E2D4158BF00B06201 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		931BD55F2D4158BF00B06201 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		931BD5602D4158BF00B06201 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		931BD5652D4158BF00B06201 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		931BD5652D4158BF00B06201 /* MoviesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesListViewController.swift; sourceTree = "<group>"; };
 		934A700A2D41B75E0079067B /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		934A700C2D41B7940079067B /* MoviesListDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesListDTO.swift; sourceTree = "<group>"; };
 		934A700E2D41B9D20079067B /* AlamoNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamoNetworking.swift; sourceTree = "<group>"; };
@@ -47,6 +50,9 @@
 		934A701C2D41CEC90079067B /* MoviesAPIHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesAPIHeader.swift; sourceTree = "<group>"; };
 		934A701F2D41CF1E0079067B /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		934A70212D41CF570079067B /* NetworkRequestBodyConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestBodyConvertible.swift; sourceTree = "<group>"; };
+		934A70232D41EB470079067B /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		934A70272D41EBB10079067B /* AssemblyModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssemblyModelBuilder.swift; sourceTree = "<group>"; };
+		934A70292D41F1590079067B /* MoviesListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesListPresenter.swift; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +150,37 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
+		934A70252D41EB900079067B /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				934A70262D41EBA10079067B /* Builder */,
+				934A70232D41EB470079067B /* Router.swift */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
+		934A70262D41EBA10079067B /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				934A70272D41EBB10079067B /* AssemblyModelBuilder.swift */,
+			);
+			path = Builder;
+			sourceTree = "<group>";
+		};
+		934A702B2D41F1B10079067B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		934A702C2D41F5790079067B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		937391B52D41A7DD0036EDED /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -158,6 +195,7 @@
 		937391B62D41A7E60036EDED /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				934A70252D41EB900079067B /* Router */,
 				937391BD2D41A8CC0036EDED /* Common */,
 				937391BC2D41A8BD0036EDED /* Details */,
 				937391BB2D41A8AF0036EDED /* MainList */,
@@ -186,6 +224,7 @@
 		937391B92D41A8060036EDED /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				934A702C2D41F5790079067B /* Extensions */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -201,6 +240,7 @@
 		937391BB2D41A8AF0036EDED /* MainList */ = {
 			isa = PBXGroup;
 			children = (
+				934A702B2D41F1B10079067B /* Model */,
 				937391C22D41A8F10036EDED /* View */,
 				937391C12D41A8E80036EDED /* Presenter */,
 			);
@@ -255,6 +295,7 @@
 		937391C12D41A8E80036EDED /* Presenter */ = {
 			isa = PBXGroup;
 			children = (
+				934A70292D41F1590079067B /* MoviesListPresenter.swift */,
 			);
 			path = Presenter;
 			sourceTree = "<group>";
@@ -262,7 +303,7 @@
 		937391C22D41A8F10036EDED /* View */ = {
 			isa = PBXGroup;
 			children = (
-				931BD5652D4158BF00B06201 /* ViewController.swift */,
+				931BD5652D4158BF00B06201 /* MoviesListViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -397,16 +438,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934A70282D41EBB10079067B /* AssemblyModelBuilder.swift in Sources */,
 				934A700D2D41B7990079067B /* MoviesListDTO.swift in Sources */,
 				934A701A2D41BFDF0079067B /* SortMoviesOption.swift in Sources */,
 				934A700B2D41B7640079067B /* NetworkError.swift in Sources */,
 				931BD5672D4158BF00B06201 /* AppDelegate.swift in Sources */,
-				931BD5692D4158BF00B06201 /* ViewController.swift in Sources */,
+				931BD5692D4158BF00B06201 /* MoviesListViewController.swift in Sources */,
 				934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */,
 				934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */,
 				934A701D2D41CEC90079067B /* MoviesAPIHeader.swift in Sources */,
 				934A70182D41BFC60079067B /* AvailableLanguages.swift in Sources */,
 				934A70112D41BB730079067B /* Endpoints.swift in Sources */,
+				934A702A2D41F1610079067B /* MoviesListPresenter.swift in Sources */,
+				934A70242D41EB4A0079067B /* Router.swift in Sources */,
 				934A70132D41BCB30079067B /* APIHost.swift in Sources */,
 				934A70202D41CF1E0079067B /* Endpoint.swift in Sources */,
 				934A700F2D41B9E10079067B /* AlamoNetworking.swift in Sources */,
