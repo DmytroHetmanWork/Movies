@@ -9,9 +9,12 @@ import UIKit
 
 final class MoviesDataSource {
     
+    typealias Movies = [MoviePreviewModel]
     typealias SectionModel = MoviesListPresenter.MoviesSectionModel
     
-    private var diffable: UITableViewDiffableDataSource<SectionModel, MoviePreviewModel>!
+    var movies: Movies = []
+    
+    private(set) var diffable: UITableViewDiffableDataSource<SectionModel, MoviePreviewModel>!
     
     init(tableView: UITableView) {
         self.diffable = .init(
@@ -24,6 +27,7 @@ final class MoviesDataSource {
     }
 
     func update(with movies: [MoviePreviewModel]) {
+        self.movies.append(contentsOf: movies)
         var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
         snapshot.appendSections([.movies])
         snapshot.appendItems(movies, toSection: .movies)

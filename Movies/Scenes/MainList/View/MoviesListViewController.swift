@@ -9,9 +9,11 @@ import UIKit
 
 protocol MoviesListView: AnyObject {
     var moviesTableView: UITableView { get }
+    
+    func setupDatasource()
 }
 
-final class MoviesListViewController: UIViewController {
+final class MoviesListViewController: UIViewController, MoviesListView {
     
     let moviesTableView: UITableView = {
         let tableView = UITableView()
@@ -46,6 +48,9 @@ final class MoviesListViewController: UIViewController {
         
         setupUI()
         setupTableView()
+        presenter.moviesListView = self
+        setupDatasource()
+        presenter.loadMore()
     }
 
     private func setupUI() {
@@ -75,10 +80,11 @@ final class MoviesListViewController: UIViewController {
     
     private func setupTableView() {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
+        moviesTableView.rowHeight = 300
     }
     
-}
-
-extension MoviesListViewController: MoviesListView {
+    func setupDatasource() {
+        presenter.setupDatasource()
+    }
     
 }
