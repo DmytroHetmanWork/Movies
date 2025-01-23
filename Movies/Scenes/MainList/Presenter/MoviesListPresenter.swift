@@ -13,4 +13,8 @@ protocol MoviesListPresenterProtocol: AnyObject {
 
 final class MoviesListPresenter: MoviesListPresenterProtocol {
     
+    enum MoviesSectionModel: Int {
+        case movies
+    }
+    
 }
