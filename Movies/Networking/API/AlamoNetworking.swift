@@ -33,7 +33,7 @@ final class AlamoNetworking<T: Endpoint>: AlamoNetworkingServiceProtocol {
         _ parameters: NetworkRequestBodyConvertible,
         completion: @escaping (NetworkResult) -> Void
     ) {
-        
+        print(host.add("/\(endpoint.pathComponent)", parameters))
         AF.request(
             host.add("/\(endpoint.pathComponent)", parameters),
             method: method,

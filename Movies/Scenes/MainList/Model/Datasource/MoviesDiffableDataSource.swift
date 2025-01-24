@@ -13,6 +13,7 @@ final class MoviesDataSource {
     typealias SectionModel = MoviesListPresenter.MoviesSectionModel
     
     var movies: Movies = []
+    var searchedMovies: Movies = []
     
     private(set) var diffable: UITableViewDiffableDataSource<SectionModel, MoviePreviewModel>!
     
@@ -36,6 +37,19 @@ final class MoviesDataSource {
         var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
         snapshot.appendSections([.movies])
         snapshot.appendItems(self.movies, toSection: .movies)
+        diffable.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func updateForSearch(with movies: [MoviePreviewModel], shouldReset: Bool = false) {
+        if shouldReset {
+            self.searchedMovies = movies
+        } else {
+            self.searchedMovies.append(contentsOf: movies)
+        }
+        
+        var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
+        snapshot.appendSections([.movies])
+        snapshot.appendItems(self.searchedMovies, toSection: .movies)
         diffable.apply(snapshot, animatingDifferences: true)
     }
 }

@@ -39,11 +39,13 @@ struct DiscoverMoviesList: NetworkRequestBodyConvertible {
 
 struct SearchMovieList: NetworkRequestBodyConvertible {
     
+    let query: String
     let includeAdult: Bool
     let language: AvailableLanguages
     let page: Int
     
-    init(includeAdult: Bool = false, language: AvailableLanguages = .enUS, page: Int) {
+    init(query: String, includeAdult: Bool = false, language: AvailableLanguages = .enUS, page: Int) {
+        self.query = query
         self.includeAdult = includeAdult
         self.language = language
         self.page = page
@@ -53,6 +55,7 @@ struct SearchMovieList: NetworkRequestBodyConvertible {
     
     var queryItems: [URLQueryItem]? {
         [
+            URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "include_adult", value: includeAdult.description),
             URLQueryItem(name: "language", value: language.rawValue),
             URLQueryItem(name: "page", value:  "\(page)"),

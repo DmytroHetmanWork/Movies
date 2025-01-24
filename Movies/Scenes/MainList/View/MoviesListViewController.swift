@@ -61,6 +61,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         setupTableView()
         presenter.moviesListView = self
         setupDatasource()
+        
+        setupSearhBar()
     }
 
     private func setupUI() {
@@ -72,8 +74,6 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         labelTitle.font = .systemFont(ofSize: 16, weight: .medium)
         
         navigationItem.titleView = labelTitle
-        
-
         
         
         view.addSubview(searchBar)
@@ -116,6 +116,10 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         }
     }
     
+    private func setupSearhBar() {
+        searchBar.delegate = self
+    }
+    
     @objc func refresh(_ sender: AnyObject) {
         presenter.refreshMovies(withNewSorting: nil)
     }
@@ -139,4 +143,14 @@ extension MoviesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         presenter.checkWhenToLoad(on: indexPath)
     }
+}
+
+extension MoviesListViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        presenter.search(by: searchText, completion: { [weak self] result in
+            
+        })
+    }
+    
 }
