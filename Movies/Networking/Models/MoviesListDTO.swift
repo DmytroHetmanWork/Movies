@@ -10,6 +10,13 @@ import Foundation
 struct MoviesListDTO: Codable {
     let page: Int
     let results: [MovieItemDTO]
+    let totalPages: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case page
+        case results
+        case totalPages = "total_pages"
+    }
 }
 
 struct MovieItemDTO: Codable {
@@ -22,9 +29,9 @@ struct MovieItemDTO: Codable {
     let releaseDate: String
     
     enum CodingKeys: String, CodingKey {
-        case adult = "adult"
-        case id = "id"
-        case title = "title"
+        case adult
+        case id
+        case title
         case genreIds = "genre_ids"
         case voteAverage = "vote_average"
         case posterPath = "poster_path"
