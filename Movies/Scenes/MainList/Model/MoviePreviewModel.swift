@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import DataCache
 
 struct MoviePreviewModel: Hashable {
     let id: Int
@@ -16,15 +17,18 @@ struct MoviePreviewModel: Hashable {
     let imagePath: String
     let image: UIImage?
     
-    init(from dto: MovieItemDTO, genreMap: [Int: String] = [:]) {
+    init?(from dto: MovieItemDTO, genres: [GenreItemDTO]) {
         self.id = dto.id
         self.title = dto.title
         self.year = String(dto.releaseDate.prefix(4))
         self.genres = dto.genreIds
-            .compactMap { genreMap[$0] }
+            .compactMap { genreId in
+                genres.first(where: { $0.id == genreId })?.name
+            }
             .joined(separator: ", ")
         self.rating = String(format: "%.1f", dto.voteAverage)
         self.imagePath = dto.posterPath
         self.image = nil
     }
+
 }

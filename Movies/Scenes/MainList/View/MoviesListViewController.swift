@@ -21,7 +21,11 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.backgroundColor = .clear
+        searchBar.isTranslucent = true
+        searchBar.alpha = 1
+        searchBar.backgroundColor = UIColor.lightGray
+        searchBar.tintColor = .black
+        searchBar.barStyle = .default
         searchBar.text = ""
         searchBar.placeholder = "Search"
         return searchBar
@@ -63,7 +67,13 @@ final class MoviesListViewController: UIViewController, MoviesListView {
 
     private func setupUI() {
         view.backgroundColor = .white
-        navigationController?.navigationBar.topItem?.title = "Movies"
+        
+        let labelTitle = UILabel()
+        labelTitle.text = "Popular movies"
+        labelTitle.textColor = .black
+        labelTitle.font = .systemFont(ofSize: 16, weight: .medium)
+        
+        navigationItem.titleView = labelTitle
         
 
         

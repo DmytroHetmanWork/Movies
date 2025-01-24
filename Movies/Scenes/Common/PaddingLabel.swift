@@ -7,40 +7,80 @@
 
 import UIKit
 
-@IBDesignable
-final class PaddingLabel: UILabel {
+final class PaddingLabelView: UIView {
     
-    @IBInspectable var topInset: CGFloat = 3.0
-    @IBInspectable var bottomInset: CGFloat = 3.0
-    @IBInspectable var leftInset: CGFloat = 5.0
-    @IBInspectable var rightInset: CGFloat = 5.0
-
-    private var textInsets: UIEdgeInsets {
-        UIEdgeInsets(top: topInset, left: leftInset, bottom: bottomInset, right: rightInset)
+    let label = UILabel()
+    var paddingLeft: CGFloat = 4
+    var paddingRight: CGFloat = 4
+    var paddingTop: CGFloat = 4
+    var paddingBottom: CGFloat = 4
+    
+    // Initializer with background color
+    init(backgroundColor: UIColor = .clear) {
+        super.init(frame: .zero)
+        self.backgroundColor = backgroundColor
+        setupLabel()
     }
     
-    override func drawText(in rect: CGRect) {
-        super.drawText(in: rect.inset(by: textInsets))
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-    override var intrinsicContentSize: CGSize {
-        let size = super.intrinsicContentSize
-        let adjustedWidth = size.width + leftInset + rightInset
-        let adjustedHeight = size.height + topInset + bottomInset
-        return CGSize(width: adjustedWidth, height: adjustedHeight)
+    // MARK: - Label Configuration
+    private func setupLabel() {
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        addSubview(label)
+        
+        // Constraints to handle padding
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: paddingLeft),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -paddingRight),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: paddingTop),
+            label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -paddingBottom),
+        ])
     }
     
-    override func sizeThatFits(_ size: CGSize) -> CGSize {
-        let fittingSize = super.sizeThatFits(CGSize(width: size.width - leftInset - rightInset, height: size.height - topInset - bottomInset))
-        return CGSize(width: fittingSize.width + leftInset + rightInset, height: fittingSize.height + topInset + bottomInset)
+    // MARK: - Public API for Label Properties
+    var text: String? {
+        get { label.text }
+        set { label.text = newValue }
     }
     
-    override var bounds: CGRect {
-        didSet {
-            let effectiveWidth = bounds.width - (leftInset + rightInset)
-            if preferredMaxLayoutWidth != effectiveWidth {
-                preferredMaxLayoutWidth = effectiveWidth
-                setNeedsLayout()
+    var font: UIFont? {
+        get { label.font }
+        set { label.font = newValue }
+    }
+    
+    var textColor: UIColor? {
+        get { label.textColor }
+        set { label.textColor = newValue }
+    }
+    
+    var textAlignment: NSTextAlignment {
+        get { label.textAlignment }
+        set { label.textAlignment = newValue }
+    }
+    
+    // MARK: - Update Padding
+    func updatePadding(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) {
+        paddingTop = top
+        paddingLeft = left
+        paddingBottom = bottom
+        paddingRight = right
+        
+        // Update constraints
+        for constraint in constraints {
+            if let firstItem = constraint.firstItem as? UILabel, firstItem == label {
+                if constraint.firstAttribute == .leading {
+                    constraint.constant = paddingLeft
+                } else if constraint.firstAttribute == .trailing {
+                    constraint.constant = -paddingRight
+                } else if constraint.firstAttribute == .top {
+                    constraint.constant = paddingTop
+                } else if constraint.firstAttribute == .bottom {
+                    constraint.constant = -paddingBottom
+                }
             }
         }
     }

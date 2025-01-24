@@ -12,9 +12,9 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     
     private let containerView = UIView()
     private let backgroundImage = UIImageView()
-    private let titleYearLabel = PaddingLabel()
-    private let genresLabel = PaddingLabel()
-    private let ratingLabel = PaddingLabel()
+    private let titleYearLabelView = PaddingLabelView(backgroundColor: .white.withAlphaComponent(0.75))
+    private let genresLabel = PaddingLabelView(backgroundColor: .white.withAlphaComponent(0.75))
+    private let ratingLabel = PaddingLabelView(backgroundColor: .black.withAlphaComponent(0.75))
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -29,7 +29,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         super.prepareForReuse()
         
         backgroundImage.image = nil
-        titleYearLabel.text?.removeAll()
+        titleYearLabelView.label.text?.removeAll()
         genresLabel.text?.removeAll()
         ratingLabel.text?.removeAll()
         backgroundImage.stopLoading()
@@ -38,8 +38,8 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
-        titleYearLabel.layer.cornerRadius = 4
-        titleYearLabel.layer.masksToBounds = true
+        titleYearLabelView.layer.cornerRadius = 4
+        titleYearLabelView.layer.masksToBounds = true
         
         genresLabel.layer.cornerRadius = 4
         genresLabel.layer.masksToBounds = true
@@ -60,22 +60,18 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         backgroundImage.clipsToBounds = true
         backgroundImage.backgroundColor = .lightGray
         
-        titleYearLabel.font = .boldSystemFont(ofSize: 20)
-        titleYearLabel.numberOfLines = 2
-        titleYearLabel.backgroundColor = .white.withAlphaComponent(0.75)
-        titleYearLabel.textColor = .black
-//        titleYearLabel.lineBreakMode = .byWordWrapping
-        titleYearLabel.lineBreakStrategy = []
-        titleYearLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        titleYearLabelView.font = .boldSystemFont(ofSize: 20)
+        titleYearLabelView.textColor = .black
         
         genresLabel.font = .systemFont(ofSize: 16, weight: .medium)
-        genresLabel.backgroundColor = .white.withAlphaComponent(0.75)
-        genresLabel.textColor = .gray
+        genresLabel.textColor = .black
+        
+        
         
         ratingLabel.font = .systemFont(ofSize: 16, weight: .medium)
         ratingLabel.backgroundColor = .black.withAlphaComponent(0.75)
         ratingLabel.textColor = .white
-        ratingLabel.textAlignment = .right
+        ratingLabel.textAlignment = .center
         
     }
     
@@ -91,19 +87,15 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         containerView.addSubview(backgroundImage)
         
         // Title & Year Label Setup
-        titleYearLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleYearLabel.textColor = .black
-        containerView.addSubview(titleYearLabel)
+        titleYearLabelView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(titleYearLabelView)
 
         // Genres Label Setup
         genresLabel.translatesAutoresizingMaskIntoConstraints = false
-        genresLabel.textColor = .gray
         containerView.addSubview(genresLabel)
 
         // Rating Label Setup
         ratingLabel.translatesAutoresizingMaskIntoConstraints = false
-        ratingLabel.textColor = .white
-        ratingLabel.textAlignment = .right
         containerView.addSubview(ratingLabel)
 
         // Constraints
@@ -122,24 +114,27 @@ final class MoviePreviewTableViewCell: UITableViewCell {
 
             // Title & Year Label Constraints
 
-            titleYearLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            titleYearLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            titleYearLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
+            titleYearLabelView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            titleYearLabelView.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
+            titleYearLabelView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
+            titleYearLabelView.bottomAnchor.constraint(lessThanOrEqualTo: genresLabel.topAnchor, constant: -16),
 
 
             
             // Genres Label Constraints
             genresLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            genresLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingLabel.leadingAnchor, constant: -16),
             genresLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
             
             // Rating Label Constraints
             ratingLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            ratingLabel.widthAnchor.constraint(equalToConstant: 90),
             ratingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
     }
 
     func config(from model: MoviePreviewModel) {
-        titleYearLabel.text = "\(model.title), \(model.year)"
+        titleYearLabelView.label.text = "\(model.title), \(model.year)"
         genresLabel.text = model.genres
         ratingLabel.text = "Rating \(model.rating)"
         

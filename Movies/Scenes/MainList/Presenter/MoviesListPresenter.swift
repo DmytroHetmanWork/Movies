@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import DataCache
 
 protocol MoviesListPresenterProtocol: AnyObject {
     var moviesListView: MoviesListView! { get set }
@@ -45,6 +46,22 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         dataSource = MoviesDataSource(tableView: moviesListView.moviesTableView)
         moviesListView.moviesTableView.dataSource = dataSource.diffable
         
+        if DataCache.instance.hasData(forKey: CacheItemKey.movieGenresList.rawValue) {
+            initialLoading()
+        } else {
+            loadMoviesGenres { [weak self] result in
+                switch result {
+                case .success(_):
+                    self?.initialLoading()
+                case .failure(let error):
+                    print("func to show \(error) alert")
+                }
+            }
+        }
+    }
+    
+    private func initialLoading() {
+        
         loadMore(shouldReset: true) { result in
             switch result {
             case .success(_):
@@ -52,8 +69,36 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             case .failure(let error):
                 print("func to show \(error) alert")
             }
-            
         }
+    }
+    
+    private func loadMoviesGenres(_ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
+        networkService
+            .perform(
+                .get,
+                MoviesEndpoint.movieGenresList,
+                MovieGenres(language: .enUS),
+                completion: { result in
+                
+                    switch result {
+                    case .data(let data):
+                        guard let data,
+                              let genresResults = try? JSONDecoder().decode(GenresListDTO.self, from: data)
+                        else { return }
+                        
+                        do {
+                            let encodedData = try JSONEncoder().encode(genresResults.genres)
+                            DataCache.instance.write(data: encodedData, forKey: CacheItemKey.movieGenresList.rawValue)
+                        } catch {
+                            print("Failed to encode genres: \(error.localizedDescription)")
+                        }
+
+                    case .error(let networkError):
+                        print("func to show \(networkError) alert")
+                    }
+                    
+                }
+            )
     }
     
     func checkWhenToLoad(on indexPath: IndexPath) {
@@ -84,6 +129,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     func loadMore(shouldReset: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
+        print("called loading data")
         guard !isLoadingMovies else { return }
         isLoadingMovies = true
         guard currentPage <= maxPossiblePagesToLoad,
@@ -116,9 +162,13 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     func updateState(with model: MoviesListDTO, shouldReset: Bool = false) {
         
+        guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
+              let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data)
+        else { return }
+        
         let movies = model.results.compactMap {
-            let newValue = MoviePreviewModel(from: $0)
-            if !dataSource.movies.contains(newValue) || shouldReset {
+            let newValue = MoviePreviewModel(from: $0, genres: genres)
+            if let newValue, (!dataSource.movies.contains(newValue) || shouldReset) {
                 return newValue
             }
             return nil
