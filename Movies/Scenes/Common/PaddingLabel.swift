@@ -15,7 +15,6 @@ final class PaddingLabelView: UIView {
     var paddingTop: CGFloat = 4
     var paddingBottom: CGFloat = 4
     
-    // Initializer with background color
     init(backgroundColor: UIColor = .clear) {
         super.init(frame: .zero)
         self.backgroundColor = backgroundColor
@@ -32,7 +31,6 @@ final class PaddingLabelView: UIView {
         label.numberOfLines = 0
         addSubview(label)
         
-        // Constraints to handle padding
         NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: paddingLeft),
             label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -paddingRight),
@@ -69,7 +67,6 @@ final class PaddingLabelView: UIView {
         paddingBottom = bottom
         paddingRight = right
         
-        // Update constraints
         for constraint in constraints {
             if let firstItem = constraint.firstItem as? UILabel, firstItem == label {
                 if constraint.firstAttribute == .leading {

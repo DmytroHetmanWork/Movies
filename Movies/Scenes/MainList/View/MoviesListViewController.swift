@@ -13,11 +13,11 @@ protocol MoviesListView: AnyObject {
     func setupDatasource()
     func reloadData()
     func endRefreshing()
+    func showLoadingFooter()
+    func hideLoadingFooter()
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
-    
-    
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -40,8 +40,6 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         tableView.showsVerticalScrollIndicator = false
         return tableView
     }()
-    
-    
     
     private var presenter: MoviesListPresenterProtocol
     
@@ -102,6 +100,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
         moviesTableView.delegate = self
         moviesTableView.rowHeight = 300
+        moviesTableView.tableFooterView = .createLoadingFooter(in: moviesTableView.contentSize)
         
         refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
         moviesTableView.addSubview(refreshControl)
@@ -123,6 +122,14 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
     func endRefreshing() {
         refreshControl.endRefreshing()
+    }
+    
+    func showLoadingFooter() {
+        moviesTableView.tableFooterView = .createLoadingFooter(in: moviesTableView.contentSize)
+    }
+
+    func hideLoadingFooter() {
+        moviesTableView.tableFooterView = nil
     }
     
 }

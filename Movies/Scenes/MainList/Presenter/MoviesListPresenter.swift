@@ -132,6 +132,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         print("called loading data")
         guard !isLoadingMovies else { return }
         isLoadingMovies = true
+        moviesListView?.showLoadingFooter()
         guard currentPage <= maxPossiblePagesToLoad,
               currentPage <= totalLoadedPages
         else { return }
@@ -152,11 +153,13 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                     else { return }
                     
                     self?.updateState(with: moviesResults, shouldReset: shouldReset)
+                    self?.moviesListView?.hideLoadingFooter()
                     completion?(.success(()))
                 case .error(let error):
                     completion?(.failure(error))
                 }
                 self?.isLoadingMovies = false
+                
             })
     }
     
