@@ -12,7 +12,7 @@ final class AlamoNetworking<T: Endpoint> {
     
     enum Result {
         case data(Data?)
-        case error(Error)
+        case error(NetworkError)
     }
     
     private var host: String
@@ -34,7 +34,21 @@ final class AlamoNetworking<T: Endpoint> {
                    parameters: parameters.parameters,
                    headers: HTTPHeaders(headers))
             .response { response in
-                if let error = response.error {
+                if let _ = response.error {
+                    var error: NetworkError = .undefinedError
+                    if let httpResponse = response.response {
+                        switch httpResponse.statusCode {
+                            case 401:
+                                error = .invalidAPIKey
+                            case 404, 422:
+                                error = .noData
+                            default:
+                                error = .networkError
+                        }
+                        completion(.error(error))
+                        return
+                    }
+                    
                     completion(.error(error))
                 } else {
                     completion(.data(response.data))

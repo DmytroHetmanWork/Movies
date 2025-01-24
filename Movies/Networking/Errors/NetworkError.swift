@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import Alamofire
 
-enum NetworkError {
+enum NetworkError: Error {
     case invalidAPIKey
-    case requestTimedOut
-    case failedToLoadImage
+    case noData
+    case networkError
+    case undefinedError
 }

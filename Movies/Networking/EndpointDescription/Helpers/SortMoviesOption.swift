@@ -33,4 +33,22 @@ extension SortMoviesOption {
             "primary_release_date.desc"
         }
     }
+    
+    var navigationTitle: String {
+        switch self {
+        case .popularityDesc:
+            "Popular movies"
+        case .revenueDesc:
+            "Most revenue movies"
+        case .titleAsc:
+            "A - Z movies"
+        case .titleDesc:
+            "Z - A movies"
+        case .primaryReleaseDateAsc:
+            "Newest movies"
+        case .primaryReleaseDateDesc:
+            "Oldest movies"
+        }
+    }
+    
 }

@@ -10,5 +10,5 @@ import Foundation
 
 enum AvailableLanguages: String {
     case enUS = "en-US"
-    case ua = "uk-US"
+    case uaUS = "uk-US"
 }

@@ -15,7 +15,7 @@ struct DiscoverMoviesList: NetworkRequestBodyConvertible {
     var page: Int
     var sortBy: SortMoviesOption
     
-    init(includeAdult: Bool = false, includeVideo: Bool = false, language: AvailableLanguages = .enUS, page: Int, sortBy option: SortMoviesOption) {
+    init(includeAdult: Bool = false, includeVideo: Bool = true, language: AvailableLanguages = .enUS, page: Int, sortBy option: SortMoviesOption) {
         self.includeAdult = includeAdult
         self.includeVideo = includeVideo
         self.language = language
@@ -37,8 +37,47 @@ struct DiscoverMoviesList: NetworkRequestBodyConvertible {
     var parameters: [String : Any]? { nil }
 }
 
+struct SearchMovieList: NetworkRequestBodyConvertible {
+    
+    let includeAdult: Bool
+    let language: AvailableLanguages
+    let page: Int
+    
+    init(includeAdult: Bool = false, language: AvailableLanguages = .enUS, page: Int) {
+        self.includeAdult = includeAdult
+        self.language = language
+        self.page = page
+    }
+    
+    var data: Data? { nil }
+    
+    var queryItems: [URLQueryItem]? {
+        [
+            URLQueryItem(name: "include_adult", value: includeAdult.description),
+            URLQueryItem(name: "language", value: language.rawValue),
+            URLQueryItem(name: "page", value:  "\(page)"),
+        ]
+    }
+    var parameters: [String : Any]? { nil }
+}
+
 struct MovieImage: NetworkRequestBodyConvertible {
     var data: Data? { nil }
     var queryItems: [URLQueryItem]? { nil }
     var parameters: [String : Any]? { nil }
 }
+
+struct MovieGenres: NetworkRequestBodyConvertible {
+    
+    var language: AvailableLanguages
+    
+    var data: Data? { nil }
+    var queryItems: [URLQueryItem]? {
+        [
+            URLQueryItem(name: "language", value: language.rawValue),
+        ]
+    }
+    var parameters: [String : Any]? { nil }
+}
+
+

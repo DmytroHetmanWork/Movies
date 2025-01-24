@@ -10,6 +10,8 @@ import Foundation
 enum MoviesEndpoint: String, Endpoint {
     
     case discoverMovie = "discover/movie"
+    case movieGenresList = "genre/movie/list"
+    case searchMoive = "search/movie"
     
     var pathComponent: String {
         rawValue
