@@ -7,7 +7,6 @@
 
 import Foundation
 import Alamofire
-import AlamofireImage
 
 final class AlamoNetworking<T: Endpoint> {
     
