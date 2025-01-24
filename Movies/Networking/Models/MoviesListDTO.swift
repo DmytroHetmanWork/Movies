@@ -25,7 +25,8 @@ struct MovieItemDTO: Codable {
     let id: Int
     let title: String
     let voteAverage: Double
-    let posterPath: String
+    let voteCount: Int
+    let posterPath: String?
     let releaseDate: String
     
     enum CodingKeys: String, CodingKey {
@@ -34,6 +35,7 @@ struct MovieItemDTO: Codable {
         case title
         case genreIds = "genre_ids"
         case voteAverage = "vote_average"
+        case voteCount = "vote_count"
         case posterPath = "poster_path"
         case releaseDate = "release_date"
     }

@@ -38,6 +38,8 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
+        containerView.addStandardShadow()
+        
         titleYearLabelView.layer.cornerRadius = 4
         titleYearLabelView.layer.masksToBounds = true
         
@@ -46,6 +48,8 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         
         ratingLabel.layer.cornerRadius = 4
         ratingLabel.layer.masksToBounds = true
+        
+        
     }
     
     private func setup() {
@@ -55,6 +59,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     
     private func setupViews() {
         backgroundColor = .clear
+        selectionStyle = .none
         
         backgroundImage.contentMode = .scaleAspectFill
         backgroundImage.clipsToBounds = true
@@ -78,8 +83,6 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     private func setupLayout() {
         // Container View Setup
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.layer.cornerRadius = 8
-        containerView.layer.masksToBounds = true
         contentView.addSubview(containerView)
 
         // Background Image Setup
@@ -136,7 +139,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     func config(from model: MoviePreviewModel) {
         titleYearLabelView.label.text = "\(model.title), \(model.year)"
         genresLabel.text = model.genres
-        ratingLabel.text = "Rating \(model.rating)"
+        ratingLabel.text = model.rating
         
         if DataCache.instance.hasData(forKey: model.imagePath) {
             backgroundImage.image = DataCache.instance.readImage(forKey: model.imagePath)

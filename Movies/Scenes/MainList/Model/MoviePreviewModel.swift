@@ -26,8 +26,8 @@ struct MoviePreviewModel: Hashable {
                 genres.first(where: { $0.id == genreId })?.name
             }
             .joined(separator: ", ")
-        self.rating = String(format: "%.1f", dto.voteAverage)
-        self.imagePath = dto.posterPath
+        self.rating = dto.voteCount == 0 ? "Not rated" : String(format: "Rating %.1f", dto.voteAverage)
+        self.imagePath = dto.posterPath ?? ""
         self.image = nil
     }
 

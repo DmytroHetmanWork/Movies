@@ -36,6 +36,7 @@
 		934A703E2D43E33A0079067B /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A703D2D43E33A0079067B /* PaddingLabel.swift */; };
 		934A70422D43EB520079067B /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70412D43EB4C0079067B /* UIImageView+Extension.swift */; };
 		934A70452D43F9C90079067B /* CacheItemKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70442D43F9C10079067B /* CacheItemKey.swift */; };
+		934A70472D44099E0079067B /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70462D4409990079067B /* UIView+Extension.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +74,7 @@
 		934A703D2D43E33A0079067B /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		934A70412D43EB4C0079067B /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		934A70442D43F9C10079067B /* CacheItemKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheItemKey.swift; sourceTree = "<group>"; };
+		934A70462D4409990079067B /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -199,6 +201,7 @@
 		934A702C2D41F5790079067B /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				934A70462D4409990079067B /* UIView+Extension.swift */,
 				934A70412D43EB4C0079067B /* UIImageView+Extension.swift */,
 				934A70372D43AB1F0079067B /* String+Extension.swift */,
 				934A702D2D41F5FF0079067B /* UITableView+Extension.swift */,
@@ -504,6 +507,7 @@
 				931BD5692D4158BF00B06201 /* MoviesListViewController.swift in Sources */,
 				934A70422D43EB520079067B /* UIImageView+Extension.swift in Sources */,
 				934A702E2D41F6070079067B /* UITableView+Extension.swift in Sources */,
+				934A70472D44099E0079067B /* UIView+Extension.swift in Sources */,
 				934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */,
 				934A703E2D43E33A0079067B /* PaddingLabel.swift in Sources */,
 				934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */,
