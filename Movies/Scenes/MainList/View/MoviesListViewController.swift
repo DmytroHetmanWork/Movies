@@ -12,10 +12,23 @@ protocol MoviesListView: AnyObject {
     
     func setupDatasource()
     func reloadData()
+    func endRefreshing()
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
     
+    
+    
+    private let searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.backgroundColor = .clear
+        searchBar.text = ""
+        searchBar.placeholder = "Search"
+        return searchBar
+    }()
+    
+    let refreshControl = UIRefreshControl()
+
     let moviesTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
@@ -24,12 +37,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         return tableView
     }()
     
-    private let searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.text = ""
-        searchBar.placeholder = "Search"
-        return searchBar
-    }()
+    
     
     private var presenter: MoviesListPresenterProtocol
     
@@ -51,14 +59,15 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         setupTableView()
         presenter.moviesListView = self
         setupDatasource()
-        presenter.loadMore()
     }
 
     private func setupUI() {
         view.backgroundColor = .white
-        title = "Movies"
+        navigationController?.navigationBar.topItem?.title = "Movies"
+        
 
-        // Add searchBar and tableView to the view
+        
+        
         view.addSubview(searchBar)
         view.addSubview(moviesTableView)
 
@@ -83,6 +92,9 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
         moviesTableView.delegate = self
         moviesTableView.rowHeight = 300
+        
+        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        moviesTableView.addSubview(refreshControl)
     }
     
     func setupDatasource() {
@@ -95,6 +107,13 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         }
     }
     
+    @objc func refresh(_ sender: AnyObject) {
+        presenter.refreshMovies(withNewSorting: nil)
+    }
+    
+    func endRefreshing() {
+        refreshControl.endRefreshing()
+    }
     
 }
 

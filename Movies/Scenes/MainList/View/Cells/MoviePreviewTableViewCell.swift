@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import DataCache
 
 final class MoviePreviewTableViewCell: UITableViewCell {
     
     private let containerView = UIView()
     private let backgroundImage = UIImageView()
-    private let titleYearLabel = UILabel()
-    private let genresLabel = UILabel()
-    private let ratingLabel = UILabel()
+    private let titleYearLabel = PaddingLabel()
+//    private let titleYearLabel = UILabel()
+    private let genresLabel = PaddingLabel()
+    private let ratingLabel = PaddingLabel()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,7 +26,60 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        backgroundImage.image = nil
+        titleYearLabel.text?.removeAll()
+        genresLabel.text?.removeAll()
+        ratingLabel.text?.removeAll()
+    }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        titleYearLabel.layer.cornerRadius = 4
+        titleYearLabel.layer.masksToBounds = true
+        
+        genresLabel.layer.cornerRadius = 4
+        genresLabel.layer.masksToBounds = true
+        
+        ratingLabel.layer.cornerRadius = 4
+        ratingLabel.layer.masksToBounds = true
+    }
+    
     private func setup() {
+        setupViews()
+        setupLayout()
+    }
+    
+    private func setupViews() {
+        backgroundColor = .clear
+        
+        backgroundImage.contentMode = .scaleAspectFill
+        backgroundImage.clipsToBounds = true
+        backgroundImage.backgroundColor = .lightGray
+        
+        titleYearLabel.font = .boldSystemFont(ofSize: 20)
+        titleYearLabel.numberOfLines = 2
+        titleYearLabel.backgroundColor = .white.withAlphaComponent(0.75)
+        titleYearLabel.textColor = .black
+//        titleYearLabel.lineBreakMode = .byWordWrapping
+        titleYearLabel.lineBreakStrategy = []
+        titleYearLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        genresLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        genresLabel.backgroundColor = .white.withAlphaComponent(0.75)
+        genresLabel.textColor = .gray
+        
+        ratingLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        ratingLabel.backgroundColor = .black.withAlphaComponent(0.75)
+        ratingLabel.textColor = .white
+        ratingLabel.textAlignment = .right
+        
+    }
+    
+    private func setupLayout() {
         // Container View Setup
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.layer.cornerRadius = 8
@@ -33,27 +88,21 @@ final class MoviePreviewTableViewCell: UITableViewCell {
 
         // Background Image Setup
         backgroundImage.translatesAutoresizingMaskIntoConstraints = false
-        backgroundImage.contentMode = .scaleAspectFill
-        backgroundImage.clipsToBounds = true
-        backgroundImage.backgroundColor = .lightGray // Placeholder background color
         containerView.addSubview(backgroundImage)
         
         // Title & Year Label Setup
         titleYearLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleYearLabel.font = UIFont.boldSystemFont(ofSize: 16)
         titleYearLabel.textColor = .black
         containerView.addSubview(titleYearLabel)
 
         // Genres Label Setup
         genresLabel.translatesAutoresizingMaskIntoConstraints = false
-        genresLabel.font = UIFont.systemFont(ofSize: 14)
         genresLabel.textColor = .gray
         containerView.addSubview(genresLabel)
 
         // Rating Label Setup
         ratingLabel.translatesAutoresizingMaskIntoConstraints = false
-        ratingLabel.font = UIFont.systemFont(ofSize: 14)
-        ratingLabel.textColor = .gray
+        ratingLabel.textColor = .white
         ratingLabel.textAlignment = .right
         containerView.addSubview(ratingLabel)
 
@@ -72,8 +121,12 @@ final class MoviePreviewTableViewCell: UITableViewCell {
             backgroundImage.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
 
             // Title & Year Label Constraints
+
             titleYearLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            titleYearLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             titleYearLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
+
+
             
             // Genres Label Constraints
             genresLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
@@ -88,7 +141,21 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     func config(from model: MoviePreviewModel) {
         titleYearLabel.text = "\(model.title), \(model.year)"
         genresLabel.text = model.genres
-        ratingLabel.text = model.rating
-        backgroundImage.image = model.image
+        ratingLabel.text = "Rating \(model.rating)"
+        
+        if DataCache.instance.hasData(forKey: model.imagePath) {
+            backgroundImage.image = DataCache.instance.readImage(forKey: model.imagePath)
+        } else {
+            model.imagePath.load(completion: { [weak self] result in
+                switch result {
+                case .success(let image):
+                    self?.backgroundImage.image = image
+                    DataCache.instance.write(image: image, forKey: model.imagePath)
+                case .failure(_):
+                    self?.backgroundImage.image = UIImage.remove
+                }  
+            })
+        }
+        
     }
 }
