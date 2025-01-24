@@ -8,6 +8,7 @@
 import UIKit
 
 struct MoviePreviewModel: Hashable {
+    let id: Int
     let title: String
     let year: String
     let genres: String
@@ -16,6 +17,7 @@ struct MoviePreviewModel: Hashable {
     let image: UIImage?
     
     init(from dto: MovieItemDTO, genreMap: [Int: String] = [:]) {
+        self.id = dto.id
         self.title = dto.title
         self.year = String(dto.releaseDate.prefix(4))
         self.genres = dto.genreIds

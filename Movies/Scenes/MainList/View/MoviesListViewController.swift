@@ -81,6 +81,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
     private func setupTableView() {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
+        moviesTableView.delegate = self
         moviesTableView.rowHeight = 300
     }
     
@@ -95,4 +96,11 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     }
     
     
+}
+
+
+extension MoviesListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        presenter.checkWhenToLoad(on: indexPath)
+    }
 }

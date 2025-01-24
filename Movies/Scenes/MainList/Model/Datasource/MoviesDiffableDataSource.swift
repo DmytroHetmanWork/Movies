@@ -26,11 +26,16 @@ final class MoviesDataSource {
             })
     }
 
-    func update(with movies: [MoviePreviewModel]) {
-        self.movies.append(contentsOf: movies)
+    func update(with movies: [MoviePreviewModel], shouldReset: Bool = false) {
+        if shouldReset {
+            self.movies = movies
+        } else {
+            self.movies.append(contentsOf: movies)
+        }
+        
         var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
         snapshot.appendSections([.movies])
-        snapshot.appendItems(movies, toSection: .movies)
+        snapshot.appendItems(self.movies, toSection: .movies)
         diffable.apply(snapshot, animatingDifferences: true)
     }
 }

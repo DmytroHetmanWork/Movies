@@ -12,6 +12,7 @@ protocol MoviesListPresenterProtocol: AnyObject {
     
     func setupDatasource()
     func loadMore()
+    func checkWhenToLoad(on indexPath: IndexPath)
     func newSortingSelected(sortBy: SortMoviesOption)
     func serch(by text: String)
 }
@@ -24,8 +25,11 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     private var currentSortBy: SortMoviesOption = .popularityDesc
     private var currentPage = 0
+    private var nextPageToLoad = 1
     private var totalLoadedPages = 0
     private var maxPossiblePagesToLoad = 0
+    
+    private var isLoadingMovies = false
     
     private var networkService: AlamoNetworkingServiceProtocol
     private var dataSource: MoviesDataSource!
@@ -42,7 +46,18 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         moviesListView.moviesTableView.dataSource = dataSource.diffable
     }
     
+    func checkWhenToLoad(on indexPath: IndexPath) {
+        if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
+            let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
+            if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 1 == indexPath.row {
+                loadMore()
+            }
+        }
+    }
+    
     func loadMore() {
+        guard !isLoadingMovies else { return }
+        isLoadingMovies = true
         guard currentPage <= maxPossiblePagesToLoad,
               currentPage <= totalLoadedPages
         else { return }
@@ -52,7 +67,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             .get,
             MoviesEndpoint.discoverMovie,
             DiscoverMoviesList(
-                page: currentPage,
+                page: nextPageToLoad,
                 sortBy: currentSortBy
             ),
             completion: { [weak self] result in
@@ -63,10 +78,10 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                     else { return }
                     
                     self?.updateState(with: moviesResults)
-                    
                 case .error(let error):
                     print(error)
                 }
+                self?.isLoadingMovies = false
             })
     }
     
@@ -78,7 +93,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             .get,
             MoviesEndpoint.discoverMovie,
             DiscoverMoviesList(
-                page: currentPage,
+                page: nextPageToLoad,
                 sortBy: sortBy
             ),
             completion: { [weak self] result in
@@ -97,8 +112,12 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     func updateState(with model: MoviesListDTO) {
         
-        let movies = model.results.map {
-            MoviePreviewModel(from: $0)
+        let movies = model.results.compactMap {
+            let newValue = MoviePreviewModel(from: $0)
+            if !dataSource.movies.contains(newValue) {
+                return newValue
+            }
+            return nil
         }
         
         dataSource.update(with: movies)
@@ -106,6 +125,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         moviesListView.reloadData()
         
         currentPage = model.page
+        nextPageToLoad = currentPage + 1
         maxPossiblePagesToLoad = model.totalPages
         
         incrementTotalLoadedPage()
@@ -118,6 +138,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     private func resetPageStats() {
         currentPage = 0
+        nextPageToLoad = 1
         totalLoadedPages = 0
         maxPossiblePagesToLoad = 0
     }
