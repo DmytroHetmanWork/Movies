@@ -8,12 +8,16 @@
 import Foundation
 import Alamofire
 
-final class AlamoNetworking<T: Endpoint> {
-    
-    enum Result {
-        case data(Data?)
-        case error(NetworkError)
-    }
+protocol AlamoNetworkingServiceProtocol {
+    func perform(
+        _ method: HTTPMethod,
+        _ endpoint: Endpoint,
+        _ parameters: NetworkRequestBodyConvertible,
+        completion: @escaping (NetworkResult) -> Void
+    )
+}
+
+final class AlamoNetworking<T: Endpoint>: AlamoNetworkingServiceProtocol {
     
     private var host: String
     private var headers: [String : String]
@@ -25,44 +29,35 @@ final class AlamoNetworking<T: Endpoint> {
     
     func perform(
         _ method: HTTPMethod,
-        _ endpoint: T,
+        _ endpoint: Endpoint,
         _ parameters: NetworkRequestBodyConvertible,
-        completion: @escaping (Result) -> ()
+        completion: @escaping (NetworkResult) -> Void
     ) {
-        AF.request(composeRequest(host + "/\(endpoint.pathComponent)", parameters),
-                   method: method,
-                   parameters: parameters.parameters,
-                   headers: HTTPHeaders(headers))
-            .response { response in
-                if let _ = response.error {
-                    var error: NetworkError = .undefinedError
-                    if let httpResponse = response.response {
-                        switch httpResponse.statusCode {
-                            case 401:
-                                error = .invalidAPIKey
-                            case 404, 422:
-                                error = .noData
-                            default:
-                                error = .networkError
-                        }
-                        completion(.error(error))
-                        return
+        
+        AF.request(
+            host.add("/\(endpoint.pathComponent)", parameters),
+            method: method,
+            parameters: parameters.parameters,
+            headers: HTTPHeaders(headers)
+        )
+        .response { response in
+            if let _ = response.error {
+                var error: NetworkError = .undefinedError
+                if let httpResponse = response.response {
+                    switch httpResponse.statusCode {
+                    case 401:
+                        error = .invalidAPIKey
+                    case 404, 422:
+                        error = .noData
+                    default:
+                        error = .networkError
                     }
-                    
-                    completion(.error(error))
-                } else {
-                    completion(.data(response.data))
                 }
+                completion(.error(error))
+            } else {
+                completion(.data(response.data))
             }
-    }
-
-    private func composeRequest(
-        _ host: String,
-        _ parameters: NetworkRequestBodyConvertible
-    ) -> String {
-        var urlComps = URLComponents(string: host)!
-        urlComps.queryItems = parameters.queryItems
-        return urlComps.url?.absoluteString ?? ""
+        }
     }
     
 }

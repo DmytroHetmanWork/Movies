@@ -26,13 +26,13 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     private var currentPage: Int = 1
     private var totalPages: Int = 1
     
-    private var networkService: AlamoNetworking<MoviesEndpoint>
+    private var networkService: AlamoNetworkingServiceProtocol
     
     weak var moviesListView: MoviesListView!
     
     private var dataSource: MoviesDataSource!
     
-    init(networkService: AlamoNetworking<MoviesEndpoint>) {
+    init(networkService: AlamoNetworkingServiceProtocol) {
         self.networkService = networkService
         
     }
@@ -48,7 +48,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         networkService
         .perform(
             .get,
-            .discoverMovie,
+            MoviesEndpoint.discoverMovie,
             DiscoverMoviesList(
                 page: currentPage,
                 sortBy: currentSortBy
@@ -83,7 +83,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         networkService
         .perform(
             .get,
-            .discoverMovie,
+            MoviesEndpoint.discoverMovie,
             DiscoverMoviesList(
                 page: currentPage,
                 sortBy: sortBy
