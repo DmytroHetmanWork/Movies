@@ -13,7 +13,6 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     private let containerView = UIView()
     private let backgroundImage = UIImageView()
     private let titleYearLabel = PaddingLabel()
-//    private let titleYearLabel = UILabel()
     private let genresLabel = PaddingLabel()
     private let ratingLabel = PaddingLabel()
     
@@ -33,6 +32,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         titleYearLabel.text?.removeAll()
         genresLabel.text?.removeAll()
         ratingLabel.text?.removeAll()
+        backgroundImage.stopLoading()
     }
     
     override func draw(_ rect: CGRect) {
@@ -146,14 +146,16 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         if DataCache.instance.hasData(forKey: model.imagePath) {
             backgroundImage.image = DataCache.instance.readImage(forKey: model.imagePath)
         } else {
+            backgroundImage.startLoading()
             model.imagePath.load(completion: { [weak self] result in
                 switch result {
                 case .success(let image):
                     self?.backgroundImage.image = image
                     DataCache.instance.write(image: image, forKey: model.imagePath)
                 case .failure(_):
-                    self?.backgroundImage.image = UIImage.remove
-                }  
+                    self?.backgroundImage.image = UIImage.imageCellBackPlaceholder
+                }
+                self?.backgroundImage.stopLoading()
             })
         }
         
