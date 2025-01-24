@@ -86,7 +86,6 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     }
 
     func config(from model: MoviePreviewModel) {
-        // Example model configuration (you need to define MovieModel)
         titleYearLabel.text = "\(model.title), \(model.year)"
         genresLabel.text = model.genres
         ratingLabel.text = model.rating

@@ -11,6 +11,7 @@ protocol MoviesListView: AnyObject {
     var moviesTableView: UITableView { get }
     
     func setupDatasource()
+    func reloadData()
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
@@ -86,5 +87,12 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     func setupDatasource() {
         presenter.setupDatasource()
     }
+    
+    func reloadData() {
+        DispatchQueue.main.async { [weak self] in
+            self?.moviesTableView.reloadData()
+        }
+    }
+    
     
 }

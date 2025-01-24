@@ -23,14 +23,14 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     private var currentSortBy: SortMoviesOption = .popularityDesc
-    private var currentPage: Int = 1
-    private var totalPages: Int = 1
+    private var currentPage = 0
+    private var totalLoadedPages = 0
+    private var maxPossiblePagesToLoad = 0
     
     private var networkService: AlamoNetworkingServiceProtocol
+    private var dataSource: MoviesDataSource!
     
     weak var moviesListView: MoviesListView!
-    
-    private var dataSource: MoviesDataSource!
     
     init(networkService: AlamoNetworkingServiceProtocol) {
         self.networkService = networkService
@@ -43,7 +43,9 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     func loadMore() {
-        guard currentPage <= totalPages else { return }
+        guard currentPage <= maxPossiblePagesToLoad,
+              currentPage <= totalLoadedPages
+        else { return }
         
         networkService
         .perform(
@@ -60,17 +62,8 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                           let moviesResults = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
                     else { return }
                     
-                    let movies = moviesResults.results.map {
-                        MoviePreviewModel(from: $0)
-                    }
+                    self?.updateState(with: moviesResults)
                     
-                    self?.dataSource.update(with: movies)
-                    
-                    DispatchQueue.main.async {
-                        self?.moviesListView.moviesTableView.reloadData()
-                    }
-                    
-                    self?.incrementCurrentPage()
                 case .error(let error):
                     print(error)
                 }
@@ -78,7 +71,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     func newSortingSelected(sortBy: SortMoviesOption) {
-        resetCurrentPage()
+        resetPageStats()
         
         networkService
         .perform(
@@ -92,27 +85,45 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                 switch result {
                 case .data(let data):
                     guard let data,
-                          let _ = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
+                          let result = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
                     else { return }
-                    self?.incrementCurrentPage()
+                    
+                    self?.updateState(with: result)
                 case .error(let error):
                     print(error)
                 }
             })
     }
     
+    func updateState(with model: MoviesListDTO) {
+        
+        let movies = model.results.map {
+            MoviePreviewModel(from: $0)
+        }
+        
+        dataSource.update(with: movies)
+        
+        moviesListView.reloadData()
+        
+        currentPage = model.page
+        maxPossiblePagesToLoad = model.totalPages
+        
+        incrementTotalLoadedPage()
+        
+    }
+    
     func serch(by text: String) {
         //
     }
     
-    private func resetCurrentPage() {
-        currentPage = 1
-        totalPages = 1
+    private func resetPageStats() {
+        currentPage = 0
+        totalLoadedPages = 0
+        maxPossiblePagesToLoad = 0
     }
     
-    private func incrementCurrentPage() {
-        currentPage += 1
-        totalPages += 1
+    private func incrementTotalLoadedPage() {
+        totalLoadedPages += 1
     }
     
 }
