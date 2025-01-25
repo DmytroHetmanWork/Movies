@@ -12,4 +12,11 @@ struct PageStatusModel {
     var nextPageToLoad = 1
     var totalLoadedPages = 0
     var maxPossiblePagesToLoad = 0
+    
+    mutating func reset() {
+        currentPage = 0
+        nextPageToLoad = 1
+        totalLoadedPages = 0
+        maxPossiblePagesToLoad = 0
+    }
 }

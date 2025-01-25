@@ -162,7 +162,9 @@ extension MoviesListViewController: UISearchBarDelegate {
             searchBar.resignFirstResponder()
         }
 
-        presenter.search(by: searchText, completion: { [weak self] result in
+        presenter.search(by: searchText, isRefreshing: false, completion: { [weak self] result in
+            
+            
             searchBar.resignFirstResponder()
         })
     }
