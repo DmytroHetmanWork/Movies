@@ -26,6 +26,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         searchBar.backgroundColor = UIColor.lightGray
         searchBar.tintColor = .black
         searchBar.barStyle = .default
+        searchBar.showsCancelButton = false
         searchBar.text = ""
         searchBar.placeholder = "Search"
         return searchBar
@@ -102,6 +103,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         moviesTableView.rowHeight = 300
         moviesTableView.tableFooterView = .createLoadingFooter(in: moviesTableView.contentSize)
         
+        
         refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
         moviesTableView.addSubview(refreshControl)
     }
@@ -118,6 +120,13 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
     private func setupSearhBar() {
         searchBar.delegate = self
+        
+        let tapOnView = UITapGestureRecognizer(target: self, action: #selector(resignFromSearchBar))
+        navigationController?.navigationBar.addGestureRecognizer(tapOnView)
+    }
+    
+    @objc private func resignFromSearchBar() {
+        searchBar.resignFirstResponder()
     }
     
     @objc func refresh(_ sender: AnyObject) {
@@ -129,11 +138,11 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     }
     
     func showLoadingFooter() {
-        moviesTableView.tableFooterView = .createLoadingFooter(in: moviesTableView.contentSize)
+        moviesTableView.tableFooterView?.isHidden = false
     }
 
     func hideLoadingFooter() {
-        moviesTableView.tableFooterView = nil
+        moviesTableView.tableFooterView?.isHidden = true
     }
     
 }
@@ -148,9 +157,27 @@ extension MoviesListViewController: UITableViewDelegate {
 extension MoviesListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchBar.showsCancelButton = !searchText.isEmpty
+        if searchText.isEmpty {
+            searchBar.resignFirstResponder()
+        }
+
         presenter.search(by: searchText, completion: { [weak self] result in
-            
+            searchBar.resignFirstResponder()
         })
+    }
+    
+    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.resignFirstResponder()
     }
     
 }

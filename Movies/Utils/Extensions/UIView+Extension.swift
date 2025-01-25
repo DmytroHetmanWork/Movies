@@ -22,7 +22,7 @@ extension UIView {
         
         let activityIndicator = UIActivityIndicatorView(style: .medium)
         activityIndicator.startAnimating()
-        activityIndicator.color = .gray
+        activityIndicator.color = .black
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         
         footerView.addSubview(activityIndicator)

@@ -38,7 +38,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     private var debounceTimer: Timer?
-    private let debounceDelay: TimeInterval = 5
+    private let debounceDelay: TimeInterval = 2
     
     private var networkService: AlamoNetworkingServiceProtocol
     private var dataSource: MoviesDataSource!
@@ -114,29 +114,33 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
             if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 1 == indexPath.row {
                 if isSearching {
-                    loadMore()
+                    search(by: queryText, completion: { _ in })
                 } else {
-                    
+                    loadMore()
                 }
             }
         }
     }
     
     func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
-        resetPageStats()
-        
-        if let newSorting {
-            currentSortBy = newSorting
-        }
-        
-        loadMore(shouldReset: true) { [weak self] result in
-            switch result {
-            case .success(_):
-                self?.moviesListView.endRefreshing()
-            case .failure(let error):
-                print("func to show \(error) alert")
+        if isSearching {
+            search(by: queryText, completion: { _ in })
+        } else {
+            resetPageStats()
+            
+            if let newSorting {
+                currentSortBy = newSorting
             }
             
+            loadMore(shouldReset: true) { [weak self] result in
+                switch result {
+                case .success(_):
+                    self?.moviesListView.endRefreshing()
+                case .failure(let error):
+                    print("func to show \(error) alert")
+                }
+                
+            }
         }
     }
     
@@ -225,8 +229,15 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         debounceTimer = Timer.scheduledTimer(withTimeInterval: debounceDelay, repeats: false) { [weak self] _ in
             guard let self else { return }
             let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmedText.isEmpty else { return }
-            
+            guard !trimmedText.isEmpty
+            else {
+                isSearching = false
+                dataSource.resetMoviesList()
+                resetSearch()
+                self.isLoadingMovies = false
+                return
+            }
+            isSearching = true
             print(trimmedText)
             
             guard !isLoadingMovies else { return }
@@ -259,13 +270,14 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                     completion: { [weak self] result in
                         switch result {
                         case .data(let data):
-                            guard let data,
+                            guard let self,
+                                  let data,
                                   let moviesResults = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
                             else { return }
-                            print(self?.queryText)
-                            self?.updateState(with: moviesResults, shouldReset: isNewQueryText)
+                            print(queryText)
+                            updateState(with: moviesResults, shouldReset: isNewQueryText, isSearching: isSearching)
                             print(moviesResults)
-                            self?.moviesListView?.hideLoadingFooter()
+                            moviesListView?.hideLoadingFooter()
                             completion(.success(()))
                         case .error(let networkError):
                             completion(.failure(networkError))
@@ -273,6 +285,14 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                         self?.isLoadingMovies = false
                     })
         }
+    }
+    
+    private func resetSearch() {
+        isSearching = false
+        resetSearchedPageStats()
+        moviesListView.reloadData()
+        print("reloaded data after empty string")
+        print(dataSource.diffable.snapshot().itemIdentifiers(inSection: .movies))
     }
     
     private func resetPageStats() {

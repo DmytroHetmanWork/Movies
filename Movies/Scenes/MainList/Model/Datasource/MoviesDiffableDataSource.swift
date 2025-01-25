@@ -26,6 +26,13 @@ final class MoviesDataSource {
                 return cell
             })
     }
+    
+    func resetMoviesList() {
+        var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
+        snapshot.appendSections([.movies])
+        snapshot.appendItems(self.movies, toSection: .movies)
+        diffable.apply(snapshot, animatingDifferences: true)
+    }
 
     func update(with movies: [MoviePreviewModel], shouldReset: Bool = false) {
         if shouldReset {
