@@ -42,3 +42,11 @@ extension String {
     }
     
 }
+
+extension String {
+    var countryName: String? {
+        let current = Locale(identifier: "en_US")
+        return current.localizedString(forRegionCode: self)
+    }
+
+}

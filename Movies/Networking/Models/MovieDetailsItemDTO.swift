@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import DataCache
 
 struct MovieDetailsDTO: Codable {
     let adult: Bool
-    let genreIds: [Int]
+    let genres: [GenreItemDTO]
     let originCountry: [String]
     let id: Int
     let title: String
@@ -24,11 +25,33 @@ struct MovieDetailsDTO: Codable {
         case id
         case title
         case overview
-        case genreIds = "genre_ids"
+        case genres
         case originCountry = "origin_country"
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
         case posterPath = "poster_path"
         case releaseDate = "release_date"
+    }
+}
+
+extension MovieDetailsDTO {
+    func parseToModel() -> MovieDetailsModel {
+        return MovieDetailsModel(
+            title: title,
+            description: overview,
+            genres: genres
+                .map { genre in
+                    genre.name
+                }
+                .joined(separator: ", "),
+            rating: voteCount == 0 ? "Not rated" : String(format: "Rating %.1f", voteAverage),
+            posterPath: posterPath ?? "",
+            originCountry: originCountry
+                .compactMap { code in
+                    code.countryName
+                }
+                .joined(separator: ", "),
+            year: String(releaseDate.prefix(4))
+        )
     }
 }

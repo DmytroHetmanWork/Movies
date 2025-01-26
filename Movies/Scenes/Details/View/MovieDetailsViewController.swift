@@ -7,20 +7,16 @@
 
 import UIKit
 
-protocol MovieDetailsView: AnyObject {
-    
+protocol MovieDetailsViewProtocol: AnyObject {
+    func display(_ movie: MovieDetailsModel)
+    func displayImage(_ image: UIImage)
+    func updateNavigationTitle(_ value: String)
 }
 
-final class MovieDetailsViewController: UIViewController, MovieDetailsView {
-    
-    enum C {
-        static let backBtnImage = UIImage(systemName: "chevron.backward")?
-            .withTintColor(.black, renderingMode: .alwaysOriginal)
-    }
-    
-    private let labelTitle = UILabel()
+final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtocol {
     
     private let presenter: MovieDetailsPresenterProtocol
+    private let movieDetailsView = MovieDetailsView()
     
     init(presenter: MovieDetailsPresenterProtocol) {
         self.presenter = presenter
@@ -31,51 +27,44 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+        view = movieDetailsView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
         
-    }
-
-    private func setupUI() {
-        view.backgroundColor = .white
-        
-        
-        
+        presenter.attachView(self)
         setupNavigationBar()
-        setupLayout()
     }
     
     private func setupNavigationBar() {
-        labelTitle.text = "\(presenter.id)"
-        labelTitle.textColor = .black
-        labelTitle.font = .systemFont(ofSize: 18, weight: .semibold)
-        labelTitle.textAlignment = .center
-
-        labelTitle.translatesAutoresizingMaskIntoConstraints = false
-        if let navigationBarHeight = navigationController?.navigationBar.bounds.height {
-            labelTitle.heightAnchor.constraint(equalToConstant: navigationBarHeight).isActive = true
-        }
-        
-        labelTitle.widthAnchor.constraint(equalToConstant: 200).isActive = true
-
-        navigationItem.titleView = labelTitle
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: C.backBtnImage,
+            image: UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal),
             style: .plain,
             target: self,
             action: #selector(tappedOnBack)
         )
     }
-
-    private func setupLayout() {
-        
-    }
     
     @objc private func tappedOnBack() {
         navigationController?.popViewController(animated: true)
     }
-
+    
+    // MARK: - MovieDetailsViewProtocol
+    
+    func updateNavigationTitle(_ value: String) {
+        title = value
+    }
+    
+    func display(_ movie: MovieDetailsModel) {
+        movieDetailsView.set(movie)
+    }
+    
+    func displayImage(_ image: UIImage) {
+        movieDetailsView.set(image)
+    }
+    
 }
+

@@ -35,3 +35,53 @@ extension UIView {
         return footerView
     }
 }
+
+fileprivate var shimmerAssociationKey: UInt8 = 0
+
+extension UIView {
+    
+    // MARK: - Associated Dictionary for Shimmer Views
+    private var shimmerViews: [UIView: UIView] {
+        get {
+            return objc_getAssociatedObject(self, &shimmerAssociationKey) as? [UIView: UIView] ?? [:]
+        }
+        set {
+            objc_setAssociatedObject(self, &shimmerAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    // MARK: - Add Shimmer to Subviews
+    func addShimmer(to subviews: [UIView]) {
+        for subview in subviews {
+            guard shimmerViews[subview] == nil else { continue } // Avoid adding duplicate shimmer views
+            
+            let shimmerView = ShimmerView()
+            addSubview(shimmerView)
+            sendSubviewToBack(shimmerView) // Ensure it's behind all other views
+            
+            shimmerView.translatesAutoresizingMaskIntoConstraints = false
+            shimmerView.backgroundColor = .lightGray.withAlphaComponent(0.5)
+            shimmerView.layer.cornerRadius = 8
+            shimmerView.layer.masksToBounds = true
+            
+            NSLayoutConstraint.activate([
+                shimmerView.topAnchor.constraint(equalTo: subview.topAnchor),
+                shimmerView.leadingAnchor.constraint(equalTo: subview.leadingAnchor),
+                shimmerView.trailingAnchor.constraint(equalTo: subview.trailingAnchor),
+                shimmerView.bottomAnchor.constraint(equalTo: subview.bottomAnchor)
+            ])
+            
+            shimmerViews[subview] = shimmerView
+        }
+    }
+    
+    // MARK: - Remove Shimmer from Subviews
+    func removeShimmer(from subviews: [UIView]) {
+        for subview in subviews {
+            if let shimmerView = shimmerViews[subview] {
+                shimmerView.removeFromSuperview()
+                shimmerViews.removeValue(forKey: subview)
+            }
+        }
+    }
+}

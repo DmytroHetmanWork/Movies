@@ -28,7 +28,13 @@ final class AssemblyModelBuilder: AssemblyBuilderProtocol {
     }
     
     func createMoviesDetails(by id: Int, router: RouterProtocol) -> UIViewController {
-        let presenter = MovieDetailsPresenter(id: id)
+        let presenter = MovieDetailsPresenter(
+            movieID: id,
+            networkService: AlamoNetworking<MovieDetailsEndpoint>(
+                APIHost.themoviedb,
+                headers: MoviesAPIHeader.value
+            )
+        )
         
         let view = MovieDetailsViewController(presenter: presenter)
         return view
