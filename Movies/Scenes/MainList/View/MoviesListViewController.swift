@@ -19,6 +19,15 @@ protocol MoviesListView: AnyObject {
 
 final class MoviesListViewController: UIViewController, MoviesListView {
     
+    enum C {
+        static let sortBtnImage = UIImage(systemName: "arrow.up.arrow.down")?
+            .withTintColor(.black, renderingMode: .alwaysOriginal)
+    }
+    
+    // MARK: - UI Items
+    
+    private let labelTitle = UILabel()
+    
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.isTranslucent = true
@@ -32,7 +41,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         return searchBar
     }()
     
-    let refreshControl = UIRefreshControl()
+    private let refreshControl = UIRefreshControl()
 
     let moviesTableView: UITableView = {
         let tableView = UITableView()
@@ -41,6 +50,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         tableView.showsVerticalScrollIndicator = false
         return tableView
     }()
+    
+    // MARK: - Presenter
     
     private var presenter: MoviesListPresenterProtocol
     
@@ -59,24 +70,33 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         super.viewDidLoad()
         
         setupUI()
-        setupTableView()
         presenter.moviesListView = self
-        setupDatasource()
         
+        setupTableView()
+        setupDatasource()
         setupSearhBar()
     }
 
     private func setupUI() {
         view.backgroundColor = .white
         
-        let labelTitle = UILabel()
+        
+        
+        setupNavigationBar()
+        setupLayout()
+    }
+    
+    private func setupNavigationBar() {
         labelTitle.text = "Popular movies"
         labelTitle.textColor = .black
         labelTitle.font = .systemFont(ofSize: 16, weight: .medium)
         
         navigationItem.titleView = labelTitle
         
-        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: C.sortBtnImage, style: .plain, target: self, action: #selector(tappedOnSort))
+    }
+    
+    private func setupLayout() {
         view.addSubview(searchBar)
         view.addSubview(moviesTableView)
 
@@ -94,6 +114,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
             moviesTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
+    // MARK: - Setup tableView
     
     private func setupTableView() {
         moviesTableView.register(cellType: MoviePreviewTableViewCell.self)
@@ -116,6 +138,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         }
     }
     
+    // MARK: - SearchBar
+    
     private func setupSearhBar() {
         searchBar.delegate = self
         
@@ -126,6 +150,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     @objc private func resignFromSearchBar() {
         searchBar.resignFirstResponder()
     }
+    
+    // MARK: - Loading flow
     
     @objc func refresh(_ sender: AnyObject) {
         presenter.refreshMovies(withNewSorting: nil)
@@ -141,6 +167,12 @@ final class MoviesListViewController: UIViewController, MoviesListView {
 
     func hideLoadingFooter() {
         moviesTableView.tableFooterView?.isHidden = true
+    }
+    
+    // MARK: - Sorting
+    
+    @objc private func tappedOnSort() {
+        
     }
     
 }
