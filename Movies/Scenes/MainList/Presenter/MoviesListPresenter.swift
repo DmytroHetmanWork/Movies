@@ -18,6 +18,9 @@ protocol MoviesListPresenterProtocol: AnyObject {
     func checkWhenToLoad(on indexPath: IndexPath)
     
     func search(by text: String, isRefreshing: Bool, completion: @escaping (Result<(), NetworkError>) -> Void)
+    
+    func retrieveMovieIdToShow(by row: Int)
+    var didSelectMovieWithId: ((Int) -> Void)? { get set }
 }
 
 final class MoviesListPresenter: MoviesListPresenterProtocol {
@@ -53,6 +56,8 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     private var dataSource: MoviesDataSource!
     
     weak var moviesListView: MoviesListView!
+    
+    var didSelectMovieWithId: ((Int) -> Void)?
     
     init(networkService: AlamoNetworkingServiceProtocol) {
         self.networkService = networkService
@@ -258,7 +263,10 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     
-    
+    func retrieveMovieIdToShow(by row: Int) {
+        let movieId = isSearching ? dataSource.searchedMovies[row].id  : dataSource.movies[row].id
+        didSelectMovieWithId?(movieId)
+    }
     
 }
 

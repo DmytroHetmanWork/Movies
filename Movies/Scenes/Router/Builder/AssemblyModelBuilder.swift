@@ -9,12 +9,28 @@ import UIKit
 
 protocol AssemblyBuilderProtocol {
     func createMoviesModule(router: RouterProtocol) -> UIViewController
+    func createMoviesDetails(by id: Int, router: RouterProtocol) -> UIViewController
 }
 
-class AssemblyModelBuilder: AssemblyBuilderProtocol {
+final class AssemblyModelBuilder: AssemblyBuilderProtocol {
     func createMoviesModule(router: RouterProtocol) -> UIViewController {
-        let presenter = MoviesListPresenter(networkService: AlamoNetworking<MoviesEndpoint>(APIHost.themoviedb, headers: MoviesAPIHeader.value))
+        let presenter = MoviesListPresenter(
+            networkService: AlamoNetworking<MoviesEndpoint>(
+                APIHost.themoviedb,
+                headers: MoviesAPIHeader.value
+            )
+        )
+        presenter.didSelectMovieWithId = { id in
+            router.showMovieDetail(by: id)
+        }
         let view = MoviesListViewController(presenter: presenter)
+        return view
+    }
+    
+    func createMoviesDetails(by id: Int, router: RouterProtocol) -> UIViewController {
+        let presenter = MovieDetailsPresenter(id: id)
+        
+        let view = MovieDetailsViewController(presenter: presenter)
         return view
     }
 }

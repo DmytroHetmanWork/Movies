@@ -214,6 +214,10 @@ extension MoviesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         presenter.checkWhenToLoad(on: indexPath)
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presenter.retrieveMovieIdToShow(by: indexPath.row)
+    }
 }
 
 extension MoviesListViewController: UISearchBarDelegate {

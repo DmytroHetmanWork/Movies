@@ -14,9 +14,7 @@ protocol MoviesRouter {
 
 protocol RouterProtocol: MoviesRouter {
     func startMoviesListViewController()
-    func selectSorting()
     func showMovieDetail(by id: Int)
-    func showTrailer()
 }
 
 
@@ -35,16 +33,9 @@ final class Router: RouterProtocol {
         navigationController?.viewControllers = [moviesListVC]
     }
     
-    func selectSorting() {
-        
-    }
-    
     func showMovieDetail(by id: Int) {
-        
-    }
-    
-    func showTrailer() {
-        
+        guard let movieDetailsVC = assemblyBuilder?.createMoviesDetails(by: id, router: self) else { return }
+        navigationController?.pushViewController(movieDetailsVC, animated: true)
     }
     
 }

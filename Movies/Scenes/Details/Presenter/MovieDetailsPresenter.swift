@@ -9,12 +9,16 @@ import Foundation
 
 protocol MovieDetailsPresenterProtocol: AnyObject {
 
-    
+    var id: Int { get }
     
 }
 
 final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
     
+    let id: Int
     
+    init(id: Int) {
+        self.id = id
+    }
     
 }
