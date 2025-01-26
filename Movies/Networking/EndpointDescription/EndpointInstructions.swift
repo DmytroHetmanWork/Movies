@@ -64,12 +64,6 @@ struct SearchMovieList: NetworkRequestBodyConvertible {
     var parameters: [String : Any]? { nil }
 }
 
-struct MovieImage: NetworkRequestBodyConvertible {
-    var data: Data? { nil }
-    var queryItems: [URLQueryItem]? { nil }
-    var parameters: [String : Any]? { nil }
-}
-
 struct MovieGenres: NetworkRequestBodyConvertible {
     
     var language: AvailableLanguages
@@ -83,4 +77,20 @@ struct MovieGenres: NetworkRequestBodyConvertible {
     var parameters: [String : Any]? { nil }
 }
 
+struct MovieImage: NetworkRequestBodyConvertible {
+    var data: Data? { nil }
+    var queryItems: [URLQueryItem]? { nil }
+    var parameters: [String : Any]? { nil }
+}
 
+struct MovieDetails: NetworkRequestBodyConvertible {
+    var data: Data? { nil }
+    var queryItems: [URLQueryItem]? { nil }
+    var parameters: [String : Any]? { nil }
+}
+
+struct MovieVideos: NetworkRequestBodyConvertible {
+    var data: Data? { nil }
+    var queryItems: [URLQueryItem]? { nil }
+    var parameters: [String : Any]? { nil }
+}

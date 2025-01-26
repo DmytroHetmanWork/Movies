@@ -23,12 +23,28 @@ struct MovieImageEndpoint: Endpoint {
     
     let imagePath: String
     
-    init(imagePath: String) {
-        self.imagePath = imagePath
-    }
-    
     var pathComponent: String {
         imagePath
+    }
+    
+}
+
+struct MovieDetailsEndpoint: Endpoint {
+    
+    let id: String
+    
+    var pathComponent: String {
+        "movie/\(id)"
+    }
+    
+}
+
+struct MovieVideosEndpoint: Endpoint {
+    
+    let id: String
+    
+    var pathComponent: String {
+        "movie/\(id)/videos"
     }
     
 }

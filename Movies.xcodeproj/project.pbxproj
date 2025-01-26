@@ -40,6 +40,7 @@
 		934A70492D4438740079067B /* PageStatusModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70482D44386D0079067B /* PageStatusModel.swift */; };
 		934A704D2D4624410079067B /* MovieDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A704C2D4624410079067B /* MovieDetailsViewController.swift */; };
 		934A704F2D4624540079067B /* MovieDetailsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A704E2D46244D0079067B /* MovieDetailsPresenter.swift */; };
+		934A70512D4628DB0079067B /* MovieDetailsItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70502D4628D00079067B /* MovieDetailsItemDTO.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -81,6 +82,7 @@
 		934A70482D44386D0079067B /* PageStatusModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageStatusModel.swift; sourceTree = "<group>"; };
 		934A704C2D4624410079067B /* MovieDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailsViewController.swift; sourceTree = "<group>"; };
 		934A704E2D46244D0079067B /* MovieDetailsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailsPresenter.swift; sourceTree = "<group>"; };
+		934A70502D4628D00079067B /* MovieDetailsItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailsItemDTO.swift; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -349,6 +351,7 @@
 		937391C02D41A8DE0036EDED /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				934A70502D4628D00079067B /* MovieDetailsItemDTO.swift */,
 				934A703B2D43B3260079067B /* GenresListDTO.swift */,
 				934A700C2D41B7940079067B /* MoviesListDTO.swift */,
 			);
@@ -532,6 +535,7 @@
 				934A70242D41EB4A0079067B /* Router.swift in Sources */,
 				934A704F2D4624540079067B /* MovieDetailsPresenter.swift in Sources */,
 				934A70132D41BCB30079067B /* APIHost.swift in Sources */,
+				934A70512D4628DB0079067B /* MovieDetailsItemDTO.swift in Sources */,
 				934A70202D41CF1E0079067B /* Endpoint.swift in Sources */,
 				934A700F2D41B9E10079067B /* AlamoNetworking.swift in Sources */,
 			);
