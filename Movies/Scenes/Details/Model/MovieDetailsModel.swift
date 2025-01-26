@@ -18,13 +18,14 @@ struct MovieDetailsModel {
     let year: String
     
     var countryYear: String? {
-        if originCountry.isEmpty && !year.isEmpty {
-            return year
-        } else if !originCountry.isEmpty && year.isEmpty {
-            return originCountry
-        } else if !originCountry.isEmpty && !year.isEmpty {
+        switch (originCountry.isEmpty, year.isEmpty) {
+        case (false, false):
             return "\(originCountry), \(year)"
-        } else {
+        case (false, true):
+            return originCountry
+        case (true, false):
+            return year
+        default:
             return nil
         }
     }
