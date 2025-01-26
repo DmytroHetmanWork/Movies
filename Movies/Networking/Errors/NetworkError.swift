@@ -13,4 +13,5 @@ enum NetworkError: Error {
     case noData
     case networkError
     case undefinedError
+    case failedToDecodeGenres
 }

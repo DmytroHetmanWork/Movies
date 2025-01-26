@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SortMoviesOption {
+enum SortMoviesOption: CaseIterable {
     case popularityDesc
     case revenueDesc
     case titleAsc
@@ -37,17 +37,17 @@ extension SortMoviesOption {
     var navigationTitle: String {
         switch self {
         case .popularityDesc:
-            "Popular movies"
+            "Popular Movies"
         case .revenueDesc:
-            "Most revenue movies"
+            "Most Revenue"
         case .titleAsc:
-            "A - Z movies"
+            "Title Ascending"
         case .titleDesc:
-            "Z - A movies"
+            "Title Descending"
         case .primaryReleaseDateAsc:
-            "Newest movies"
+            "Oldest Movies"
         case .primaryReleaseDateDesc:
-            "Oldest movies"
+            "Newest Movies"
         }
     }
     

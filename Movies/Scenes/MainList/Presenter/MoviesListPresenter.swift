@@ -9,6 +9,7 @@ import UIKit
 import DataCache
 
 protocol MoviesListPresenterProtocol: AnyObject {
+    var currentSortBy: SortMoviesOption { get }
     var moviesListView: MoviesListView! { get set }
     
     func setupDatasource()
@@ -25,7 +26,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         case movies
     }
     
-    private var currentSortBy: SortMoviesOption = .popularityDesc
+    private(set) var currentSortBy: SortMoviesOption = .popularityDesc
     private var moviesListStatus = PageStatusModel()
     private var searchedMoviesStatus = PageStatusModel()
     
@@ -105,12 +106,15 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                         do {
                             let encodedData = try JSONEncoder().encode(genresResults.genres)
                             DataCache.instance.write(data: encodedData, forKey: CacheItemKey.movieGenresList.rawValue)
+                            completion?(.success(()))
                         } catch {
                             print("Failed to encode genres: \(error.localizedDescription)")
+                            completion?(.failure(.failedToDecodeGenres))
                         }
 
                     case .error(let networkError):
                         print("func to show \(networkError) alert")
+                        completion?(.failure(networkError))
                     }
                     
                 }

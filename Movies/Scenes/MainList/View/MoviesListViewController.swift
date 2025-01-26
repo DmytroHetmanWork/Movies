@@ -87,10 +87,18 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     }
     
     private func setupNavigationBar() {
-        labelTitle.text = "Popular movies"
+        labelTitle.text = presenter.currentSortBy.navigationTitle
         labelTitle.textColor = .black
-        labelTitle.font = .systemFont(ofSize: 16, weight: .medium)
+        labelTitle.font = .systemFont(ofSize: 18, weight: .semibold)
+        labelTitle.textAlignment = .center
+
+        labelTitle.translatesAutoresizingMaskIntoConstraints = false
+        if let navigationBarHeight = navigationController?.navigationBar.bounds.height {
+            labelTitle.heightAnchor.constraint(equalToConstant: navigationBarHeight).isActive = true
+        }
         
+        labelTitle.widthAnchor.constraint(equalToConstant: 200).isActive = true
+
         navigationItem.titleView = labelTitle
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: C.sortBtnImage, style: .plain, target: self, action: #selector(tappedOnSort))
@@ -172,7 +180,31 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     // MARK: - Sorting
     
     @objc private func tappedOnSort() {
+        let alert = UIAlertController(
+            title: "Choose Option",
+            message: "Select sorting option for displaying desired movies",
+            preferredStyle: .actionSheet
+        )
         
+        SortMoviesOption.allCases.forEach { option in
+            let isSelected = option == presenter.currentSortBy
+            let action = UIAlertAction(
+                title: option.navigationTitle,
+                style: .default,
+                handler: { [weak self] _ in
+                    self?.presenter.refreshMovies(withNewSorting: option)
+                    self?.labelTitle.text = option.navigationTitle
+                }
+            )
+            if isSelected {
+                action.setValue(true, forKey: "checked")
+            }
+            alert.addAction(action)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
     }
     
 }
