@@ -29,7 +29,15 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     private var moviesListStatus = PageStatusModel()
     private var searchedMoviesStatus = PageStatusModel()
     
-    private var isLoadingMovies = false
+    private var isLoadingMovies = false {
+        didSet {
+            if isLoadingMovies {
+                moviesListView?.showLoadingFooter()
+            } else {
+                moviesListView?.hideLoadingFooter()
+            }
+        }
+    }
     
     private var isSearching = false
     private var queryText = "" {
@@ -38,7 +46,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     private var debounceTimer: Timer?
-    private let debounceDelay: TimeInterval = 2
+    private let debounceDelay: TimeInterval = 0
     
     private var networkService: AlamoNetworkingServiceProtocol
     private var dataSource: MoviesDataSource!
@@ -109,17 +117,102 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             )
     }
     
-    func checkWhenToLoad(on indexPath: IndexPath) {
-        if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
-            let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
-            if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 4 == indexPath.row {
-                if isSearching {
-                    search(by: queryText, completion: { _ in })
-                } else {
-                    loadMore()
-                }
-            }
+    func loadMore(isRefreshing: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
+        guard !isLoadingMovies else { return }
+        isLoadingMovies = true
+        
+        loadMovies(
+            endpoint: .discoverMovie,
+            parameters: DiscoverMoviesList(
+                page: moviesListStatus.nextPageToLoad,
+                sortBy: currentSortBy
+            ),
+            shouldReset: isRefreshing,
+            isSearch: false,
+            completion: completion
+        )
+    }
+
+    func search(by text: String, isRefreshing: Bool = false, completion: @escaping (Result<(), NetworkError>) -> Void) {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else {
+            isSearching = false
+            dataSource.resetMoviesList()
+            resetSearch()
+            isLoadingMovies = false
+            return
         }
+        
+        guard !isLoadingMovies else { return }
+        isLoadingMovies = true
+        
+        debounceTimer?.invalidate()
+        debounceTimer = Timer.scheduledTimer(
+            withTimeInterval: debounceDelay,
+            repeats: false
+        ) { [weak self] _ in
+            guard let self else { return }
+            
+            let isNewQueryText = queryText != trimmedText
+            if isNewQueryText {
+                resetSearchedPageStats()
+                queryText = trimmedText
+            }
+            
+            loadMovies(
+                endpoint: .searchMoive,
+                parameters: SearchMovieList(
+                    query: queryText,
+                    page: searchedMoviesStatus.nextPageToLoad
+                ),
+                shouldReset: isRefreshing || isNewQueryText,
+                isSearch: true,
+                completion: completion
+            )
+        }
+    }
+
+    private func loadMovies(
+        endpoint: MoviesEndpoint,
+        parameters: NetworkRequestBodyConvertible,
+        shouldReset: Bool,
+        isSearch: Bool,
+        completion: ((Result<(), NetworkError>) -> Void)? = nil
+    ) {
+
+        let status = isSearch ? searchedMoviesStatus : moviesListStatus
+        guard status.currentPage <= status.maxPossiblePagesToLoad,
+              status.currentPage <= status.totalLoadedPages
+        else {
+            completion?(.success(()))
+            isLoadingMovies = false
+            return
+        }
+
+        networkService.perform(
+            .get,
+            endpoint,
+            parameters,
+            completion: { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .data(let data):
+                    guard let data,
+                          let moviesResults = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
+                    else { return }
+                    self.updateState(
+                        with: moviesResults,
+                        shouldReset: shouldReset,
+                        isSearching: isSearch
+                    )
+                    completion?(.success(()))
+                case .error(let error):
+                    completion?(.failure(error))
+                }
+                self.isLoadingMovies = false
+                print("after loading: \(isLoadingMovies)")
+            }
+        )
     }
     
     func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
@@ -148,158 +241,25 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     
-    func loadMore(isRefreshing: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
-        print("called loading data")
-        guard !isLoadingMovies else { return }
-        isLoadingMovies = true
-        moviesListView?.showLoadingFooter()
-        guard moviesListStatus.currentPage <= moviesListStatus.maxPossiblePagesToLoad,
-              moviesListStatus.currentPage <= moviesListStatus.totalLoadedPages
-        else {
-            completion?(.success(()))
-            self.isLoadingMovies = false
-            return
-        }
-        
-        networkService
-        .perform(
-            .get,
-            MoviesEndpoint.discoverMovie,
-            DiscoverMoviesList(
-                page: moviesListStatus.nextPageToLoad,
-                sortBy: currentSortBy
-            ),
-            completion: { [weak self] result in
-                switch result {
-                case .data(let data):
-                    guard let data,
-                          let moviesResults = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
-                    else { return }
-                    
-                    self?.updateState(with: moviesResults, shouldReset: isRefreshing)
-                    self?.moviesListView?.hideLoadingFooter()
-                    completion?(.success(()))
-                case .error(let error):
-                    completion?(.failure(error))
+    func checkWhenToLoad(on indexPath: IndexPath) {
+        if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
+            let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
+            if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 3 == indexPath.row {
+                if isSearching {
+                    search(by: queryText, completion: { _ in })
+                } else {
+                    loadMore()
                 }
-                self?.isLoadingMovies = false
-                
-            })
-    }
-    
-    func search(by text: String, isRefreshing: Bool = false, completion: @escaping (Result<(), NetworkError>) -> Void) {
-        
-        guard searchedMoviesStatus.currentPage <= searchedMoviesStatus.maxPossiblePagesToLoad,
-              searchedMoviesStatus.currentPage <= searchedMoviesStatus.totalLoadedPages
-        else {
-            completion(.success(()))
-            self.isLoadingMovies = false
-            return
-        }
-        
-        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedText.isEmpty
-        else {
-            isSearching = false
-            dataSource.resetMoviesList()
-            resetSearch()
-            self.isLoadingMovies = false
-            return
-        }
-        moviesListView?.showLoadingFooter()
-        debounceTimer?.invalidate()
-            
-        debounceTimer = Timer
-            .scheduledTimer(
-                withTimeInterval: isRefreshing ? 0 : debounceDelay,
-                repeats: false
-            ) { [weak self] _ in
-            guard let self else { return }
-            
-            isSearching = true
-            print(trimmedText)
-            
-            guard !isLoadingMovies else { return }
-            isLoadingMovies = true
-            
-            
-            let isNewQueryText = queryText != trimmedText
-            
-            if isNewQueryText {
-                resetSearchedPageStats()
-                queryText = trimmedText
             }
-            
-            
-            networkService
-                .perform(
-                    .get,
-                    MoviesEndpoint.searchMoive,
-                    SearchMovieList(
-                        query: queryText,
-                        page: searchedMoviesStatus.nextPageToLoad
-                    ),
-                    completion: { [weak self] result in
-                        switch result {
-                        case .data(let data):
-                            guard let self,
-                                  let data,
-                                  let moviesResults = try? JSONDecoder().decode(MoviesListDTO.self, from: data)
-                            else { return }
-                            print(queryText)
-                            updateState(with: moviesResults, shouldReset: isRefreshing || isNewQueryText, isSearching: isSearching)
-                            print(moviesResults)
-                            moviesListView?.hideLoadingFooter()
-                            completion(.success(()))
-                        case .error(let networkError):
-                            completion(.failure(networkError))
-                        }
-                        self?.isLoadingMovies = false
-                    })
         }
     }
     
-    func updateState(with model: MoviesListDTO, shouldReset: Bool = false, isSearching: Bool = false) {
-        
-        guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
-              let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data)
-        else { return }
-        
-        let movies = model.results.compactMap {
-            let newValue = MoviePreviewModel(from: $0, genres: genres)
-            if let newValue, (isSearching ?
-                !dataSource.movies.contains(newValue) :
-                !dataSource.searchedMovies.contains(newValue)
-                || shouldReset) {
-                return newValue
-            }
-            return nil
-        }
-        
-        if isSearching {
-            dataSource.updateForSearch(with: movies, shouldReset: shouldReset)
-            
-            moviesListView.reloadData()
-            
-            searchedMoviesStatus.currentPage = model.page
-            searchedMoviesStatus.nextPageToLoad = searchedMoviesStatus.currentPage + 1
-            searchedMoviesStatus.maxPossiblePagesToLoad = model.totalPages
-            
-            incrementTotalLoadedSearchedPage()
-        } else {
-            dataSource.update(with: movies, shouldReset: shouldReset)
-            
-            moviesListView.reloadData()
-            
-            moviesListStatus.currentPage = model.page
-            moviesListStatus.nextPageToLoad = moviesListStatus.currentPage + 1
-            moviesListStatus.maxPossiblePagesToLoad = model.totalPages
-            
-            incrementTotalLoadedPage()
-        }
-        
-        
-    }
+    
+    
+}
+
+// MARK: - Helpers to reset values
+private extension MoviesListPresenter {
     
     private func resetSearch() {
         isSearching = false
@@ -325,4 +285,56 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         searchedMoviesStatus.totalLoadedPages += 1
     }
     
+}
+
+// MARK: - Helpers update state
+private extension MoviesListPresenter {
+    func updateState(
+        with model: MoviesListDTO,
+        shouldReset: Bool = false,
+        isSearching: Bool = false
+    ) {
+        
+        guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
+              let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data)
+        else { return }
+        
+        let movies = model.results.compactMap {
+            let newValue = MoviePreviewModel(from: $0, genres: genres)
+            let moviesList = isSearching ? dataSource.searchedMovies : dataSource.movies
+            if let newValue, (!moviesList.contains(newValue) || shouldReset) {
+                return newValue
+            }
+            return nil
+        }
+        
+        if isSearching {
+            updateSearchState(with: model, movies: movies, shouldReset: shouldReset)
+        } else {
+            updateRegularState(with: model, movies: movies, shouldReset: shouldReset)
+        }
+        
+    }
+    
+    func updateSearchState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+        dataSource.updateForSearch(with: movies, shouldReset: shouldReset)
+        moviesListView.reloadData()
+        
+        searchedMoviesStatus.currentPage = model.page
+        searchedMoviesStatus.nextPageToLoad = model.page + 1
+        searchedMoviesStatus.maxPossiblePagesToLoad = model.totalPages
+        
+        incrementTotalLoadedSearchedPage()
+    }
+
+    func updateRegularState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+        dataSource.update(with: movies, shouldReset: shouldReset)
+        moviesListView.reloadData()
+        
+        moviesListStatus.currentPage = model.page
+        moviesListStatus.nextPageToLoad = model.page + 1
+        moviesListStatus.maxPossiblePagesToLoad = model.totalPages
+        
+        incrementTotalLoadedPage()
+    }
 }

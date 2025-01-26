@@ -84,12 +84,10 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         moviesTableView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            // Layout for searchBar
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            // Layout for moviesTableView
             moviesTableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             moviesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             moviesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -162,11 +160,10 @@ extension MoviesListViewController: UISearchBarDelegate {
             searchBar.resignFirstResponder()
         }
 
-        presenter.search(by: searchText, isRefreshing: false, completion: { [weak self] result in
-            
-            
-            searchBar.resignFirstResponder()
-        })
+        presenter.search(
+            by: searchText,
+            isRefreshing: false,
+            completion: { _ in })
     }
     
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
