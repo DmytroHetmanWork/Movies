@@ -26,6 +26,7 @@ final class Router: RouterProtocol {
     init(navigationController: UINavigationController, assemblyBuilder: AssemblyBuilderProtocol) {
         self.navigationController = navigationController
         self.assemblyBuilder = assemblyBuilder
+        
         setupNetworkListener()
     }
     
@@ -42,15 +43,13 @@ final class Router: RouterProtocol {
     private func setupNetworkListener() {
         let networkListener = NetworkListener.shared
         
-        // Connection lost
         networkListener.setConnectionLostClosure { [weak self] in
             DispatchQueue.main.async {
                 self?.navigationController?.showAlert(error: NetworkError.youAreOffline)
             }
         }
         
-        // Connection back
-        networkListener.setConnectionBackClosure { [weak self] in
+        networkListener.setConnectionBackClosure {
             DispatchQueue.main.async {
                 print("Internet is back!")
             }

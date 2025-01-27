@@ -21,24 +21,7 @@ enum NetworkError: Error, AlertError {
 
 extension NetworkError {
     var title: String {
-        switch self {
-        case .invalidAPIKey:
-            "Error"
-        case .noData:
-            "Error"
-        case .networkError:
-            "Error"
-        case .undefinedError:
-            "Error"
-        case .failedToDecodeGenres:
-            "Error"
-        case .failedToDecodeDetails:
-            "Error"
-        case .failedToParseDetailsModel:
-            "Error"
-        case .youAreOffline:
-            "You are offline."
-        }
+        "Error"
     }
     
     var message: String {
@@ -58,7 +41,7 @@ extension NetworkError {
         case .failedToParseDetailsModel:
             "Failed to parse details model."
         case .youAreOffline:
-            "Please, enable your Wi-Fi or connect using cellular data."
+            "You are offline. Please, enable your Wi-Fi or connect using cellular data."
         }
     }
 }

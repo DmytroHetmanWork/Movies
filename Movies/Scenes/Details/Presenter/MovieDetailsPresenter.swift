@@ -37,7 +37,7 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
         self.view = view
         loadMovieDetails { result in
             switch result {
-            case .success(let success):
+            case .success(_):
                 break
             case .failure(let failure):
                 print(failure)
