@@ -141,21 +141,9 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         genresLabel.text = model.genres
         ratingLabel.text = model.rating
         
-        if DataCache.instance.hasData(forKey: model.imagePath) {
-            backgroundImage.image = DataCache.instance.readImage(forKey: model.imagePath)
-        } else {
-            backgroundImage.startLoading()
-            model.imagePath.load(completion: { [weak self] result in
-                switch result {
-                case .success(let image):
-                    self?.backgroundImage.image = image
-                    DataCache.instance.write(image: image, forKey: model.imagePath)
-                case .failure(_):
-                    self?.backgroundImage.image = UIImage.imageCellBackPlaceholder
-                }
-                self?.backgroundImage.stopLoading()
-            })
-        }
+        guard let url = model.imageURL else { return }
+        
+        backgroundImage.setImage(with: url)
         
     }
 }

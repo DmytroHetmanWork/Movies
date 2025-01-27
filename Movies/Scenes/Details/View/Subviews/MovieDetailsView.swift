@@ -62,9 +62,10 @@ final class MovieDetailsView: UIView {
         return label
     }()
     
-    private let descriptionLabel: UITextView = {
+    private let descriptionTextView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 14)
+        textView.backgroundColor = .clear
         textView.textColor = .darkGray
         textView.isScrollEnabled = true
         textView.isEditable = false
@@ -103,7 +104,7 @@ final class MovieDetailsView: UIView {
         addSubview(genreLabel)
         addSubview(playButton)
         addSubview(ratingLabel)
-        addSubview(descriptionLabel)
+        addSubview(descriptionTextView)
     }
     
     private func setupLayout() {
@@ -135,32 +136,29 @@ final class MovieDetailsView: UIView {
             
             ratingLabel.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
             ratingLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 70),
+            ratingLabel.widthAnchor.constraint(equalToConstant: 80),
             ratingLabel.heightAnchor.constraint(equalToConstant: 20),
             
-            descriptionLabel.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 16),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            descriptionLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16)
+            descriptionTextView.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 16),
+            descriptionTextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            descriptionTextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            descriptionTextView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
     }
     
     // MARK: - Public Setters
     
     func set(_ movie: MovieDetailsModel) {
-        removeShimmer(from: [nameLabel, detailsLabel, genreLabel, ratingLabel])
+        removeShimmer(from: [imageView, nameLabel, detailsLabel, genreLabel, ratingLabel])
         
         nameLabel.text = movie.title
         detailsLabel.text = movie.countryYear
         genreLabel.text = movie.genres
         ratingLabel.text = movie.rating
-        descriptionLabel.text = movie.description
+        descriptionTextView.text = movie.description
         
-    }
-    
-    func set(_ poster: UIImage) {
-        imageView.image = poster
-        removeShimmer(from: [imageView])
+        imageView.setImage(with: movie.imageURL!)
+        
     }
 
 }

@@ -7,7 +7,7 @@ target 'Movies' do
 
   # Pods for Movies
   pod 'Alamofire'
-  pod 'AlamofireImage'
+  pod 'Kingfisher'
   pod 'DataCache'
 
 end

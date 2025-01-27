@@ -30,4 +30,8 @@ struct MovieDetailsModel {
         }
     }
     
+    var imageURL: URL? {
+        URL(string: APIHost.themoviedbImageOriginal + posterPath)
+    }
+    
 }

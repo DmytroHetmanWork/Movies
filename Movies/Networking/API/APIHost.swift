@@ -9,5 +9,6 @@ import Foundation
 
 enum APIHost {
     static let themoviedb = "https://api.themoviedb.org/3"
-    static let themoviedbImage = "https://www.themoviedb.org/t/p/w440_and_h660_face"
+    static let themoviedbImagePreview = "https://www.themoviedb.org/t/p/w440_and_h660_face"
+    static let themoviedbImageOriginal = "https://image.tmdb.org/t/p/original"
 }

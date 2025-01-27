@@ -9,7 +9,6 @@ import UIKit
 
 protocol MovieDetailsViewProtocol: AnyObject {
     func display(_ movie: MovieDetailsModel)
-    func displayImage(_ image: UIImage)
     func updateNavigationTitle(_ value: String)
 }
 
@@ -34,12 +33,14 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         presenter.attachView(self)
         setupNavigationBar()
     }
     
     private func setupNavigationBar() {
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal),
             style: .plain,
@@ -60,10 +61,6 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
     
     func display(_ movie: MovieDetailsModel) {
         movieDetailsView.set(movie)
-    }
-    
-    func displayImage(_ image: UIImage) {
-        movieDetailsView.set(image)
     }
     
 }

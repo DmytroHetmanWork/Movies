@@ -19,16 +19,6 @@ enum MoviesEndpoint: String, Endpoint {
     
 }
 
-struct MovieImageEndpoint: Endpoint {
-    
-    let imagePath: String
-    
-    var pathComponent: String {
-        imagePath
-    }
-    
-}
-
 struct MovieDetailsEndpoint: Endpoint {
     
     let id: String

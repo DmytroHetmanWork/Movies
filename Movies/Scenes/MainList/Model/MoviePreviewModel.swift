@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import DataCache
 
 struct MoviePreviewModel: Hashable {
     let id: Int
@@ -15,7 +14,8 @@ struct MoviePreviewModel: Hashable {
     let genres: String
     let rating: String
     let imagePath: String
-    let image: UIImage?
+    
+    let imageURL: URL?
     
     init?(from dto: MovieItemDTO, genres: [GenreItemDTO]) {
         self.id = dto.id
@@ -28,7 +28,11 @@ struct MoviePreviewModel: Hashable {
             .joined(separator: ", ")
         self.rating = dto.voteCount == 0 ? "Not rated" : String(format: "Rating %.1f", dto.voteAverage)
         self.imagePath = dto.posterPath ?? ""
-        self.image = nil
+        
+        self.imageURL = URL(string: APIHost.themoviedbImagePreview + imagePath)
+        
     }
+    
+    
 
 }
