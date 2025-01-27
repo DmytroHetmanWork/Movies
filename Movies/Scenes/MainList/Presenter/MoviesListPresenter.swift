@@ -84,13 +84,14 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     private func initialLoading() {
         
-        loadMore(isRefreshing: true) { result in
+        loadMore(isRefreshing: true) { [weak self] result in
             switch result {
             case .success(_):
                 break
             case .failure(let error):
                 print("func to show \(error) alert")
             }
+            self?.moviesListView.endRefreshing()
         }
     }
     
@@ -151,6 +152,10 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             isLoadingMovies = false
             return
         }
+        if !NetworkListener.shared.isReachable {
+            searchInOfflineMode(for: trimmedText)
+            return
+        }
         
         guard !isLoadingMovies else { return }
         isLoadingMovies = true
@@ -179,6 +184,23 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                 completion: completion
             )
         }
+    }
+    
+    private func searchInOfflineMode(for text: String) {
+        
+        isSearching = true
+        let filteredMovies = dataSource.movies.filter { movie in
+            movie.title.lowercased().contains(text.lowercased())
+        }
+        
+        moviesListView?.configEmptyTableState(isShowing: filteredMovies.isEmpty)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.dataSource.updateForSearch(with: filteredMovies, shouldReset: true)
+            self?.isLoadingMovies = false
+        }
+        
+        
     }
 
     private func loadMovies(
@@ -214,11 +236,13 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                         shouldReset: shouldReset,
                         isSearching: isSearch
                     )
+                    print("loaded first portion")
                     completion?(.success(()))
+                    
                 case .error(let error):
                     completion?(.failure(error))
                 }
-                self.isLoadingMovies = false
+                isLoadingMovies = false
                 print("after loading: \(isLoadingMovies)")
             }
         )
@@ -241,11 +265,11 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             loadMore(isRefreshing: true) { [weak self] result in
                 switch result {
                 case .success(_):
-                    self?.moviesListView.endRefreshing()
+                    break
                 case .failure(let error):
                     print("func to show \(error) alert")
                 }
-                
+                self?.moviesListView.endRefreshing()
             }
         }
     }
@@ -306,6 +330,9 @@ private extension MoviesListPresenter {
         shouldReset: Bool = false,
         isSearching: Bool = false
     ) {
+        if isSearching {
+            moviesListView?.configEmptyTableState(isShowing: model.results.isEmpty)
+        }
         
         guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
               let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data)

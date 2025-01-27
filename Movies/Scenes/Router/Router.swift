@@ -26,6 +26,7 @@ final class Router: RouterProtocol {
     init(navigationController: UINavigationController, assemblyBuilder: AssemblyBuilderProtocol) {
         self.navigationController = navigationController
         self.assemblyBuilder = assemblyBuilder
+        setupNetworkListener()
     }
     
     func startMoviesListViewController() {
@@ -36,6 +37,26 @@ final class Router: RouterProtocol {
     func showMovieDetail(by id: Int) {
         guard let movieDetailsVC = assemblyBuilder?.createMoviesDetails(by: id, router: self) else { return }
         navigationController?.pushViewController(movieDetailsVC, animated: true)
+    }
+    
+    private func setupNetworkListener() {
+        let networkListener = NetworkListener.shared
+        
+        // Connection lost
+        networkListener.setConnectionLostClosure { [weak self] in
+            DispatchQueue.main.async {
+                self?.navigationController?.showAlert(error: NetworkError.youAreOffline)
+            }
+        }
+        
+        // Connection back
+        networkListener.setConnectionBackClosure { [weak self] in
+            DispatchQueue.main.async {
+                print("Internet is back!")
+            }
+        }
+        
+        networkListener.startMonitoring()
     }
     
 }

@@ -15,6 +15,7 @@ protocol MoviesListView: AnyObject {
     func endRefreshing()
     func showLoadingFooter()
     func hideLoadingFooter()
+    func configEmptyTableState(isShowing: Bool)
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
@@ -49,6 +50,14 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         return tableView
+    }()
+    
+    private let emptyTableLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.text = "No results found"
+        label.textColor = .black
+        return label
     }()
     
     // MARK: - Presenter
@@ -107,9 +116,11 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     private func setupLayout() {
         view.addSubview(searchBar)
         view.addSubview(moviesTableView)
+        view.addSubview(emptyTableLabel)
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         moviesTableView.translatesAutoresizingMaskIntoConstraints = false
+        emptyTableLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -119,7 +130,11 @@ final class MoviesListViewController: UIViewController, MoviesListView {
             moviesTableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             moviesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             moviesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            moviesTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            moviesTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            emptyTableLabel.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 50),
+            emptyTableLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            emptyTableLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
     
@@ -134,6 +149,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         
         refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
         moviesTableView.addSubview(refreshControl)
+        
+        emptyTableLabel.isHidden = true
     }
     
     func setupDatasource() {
@@ -162,7 +179,13 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     // MARK: - Loading flow
     
     @objc func refresh(_ sender: AnyObject) {
-        presenter.refreshMovies(withNewSorting: nil)
+        checkConnection { isConnected in
+            if isConnected {
+                presenter.refreshMovies(withNewSorting: nil)
+            } else {
+                endRefreshing()
+            }
+        }
     }
     
     func endRefreshing() {
@@ -177,34 +200,52 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         moviesTableView.tableFooterView?.isHidden = true
     }
     
+    func configEmptyTableState(isShowing: Bool) {
+        emptyTableLabel.isHidden = !isShowing
+    }
+    
     // MARK: - Sorting
     
     @objc private func tappedOnSort() {
-        let alert = UIAlertController(
-            title: "Choose Option",
-            message: "Select sorting option for displaying desired movies",
-            preferredStyle: .actionSheet
-        )
-        
-        SortMoviesOption.allCases.forEach { option in
-            let isSelected = option == presenter.currentSortBy
-            let action = UIAlertAction(
-                title: option.navigationTitle,
-                style: .default,
-                handler: { [weak self] _ in
-                    self?.presenter.refreshMovies(withNewSorting: option)
-                    self?.labelTitle.text = option.navigationTitle
+        checkConnection { isConnected in
+            if isConnected {
+                let alert = UIAlertController(
+                    title: "Choose Option",
+                    message: "Select sorting option for displaying desired movies",
+                    preferredStyle: .actionSheet
+                )
+                
+                SortMoviesOption.allCases.forEach { option in
+                    let isSelected = option == presenter.currentSortBy
+                    let action = UIAlertAction(
+                        title: option.navigationTitle,
+                        style: .default,
+                        handler: { [weak self] _ in
+                            self?.presenter.refreshMovies(withNewSorting: option)
+                            self?.labelTitle.text = option.navigationTitle
+                        }
+                    )
+                    if isSelected {
+                        action.setValue(true, forKey: "checked")
+                    }
+                    alert.addAction(action)
                 }
-            )
-            if isSelected {
-                action.setValue(true, forKey: "checked")
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                
+                present(alert, animated: true, completion: nil)
             }
-            alert.addAction(action)
         }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-        present(alert, animated: true, completion: nil)
+    }
+    
+    private func checkConnection(completion: (Bool) -> Void) {
+        if !NetworkListener.shared.isReachable {
+            endRefreshing()
+            showAlert(error: NetworkError.youAreOffline)
+            completion(false)
+        } else {
+            completion(true)
+        }
     }
     
 }
@@ -216,7 +257,11 @@ extension MoviesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        presenter.retrieveMovieIdToShow(by: indexPath.row)
+        checkConnection { isConnected in
+            if isConnected {
+                presenter.retrieveMovieIdToShow(by: indexPath.row)
+            }
+        }
     }
 }
 

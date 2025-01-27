@@ -28,10 +28,13 @@ final class MoviesDataSource {
     }
     
     func resetMoviesList() {
-        var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
-        snapshot.appendSections([.movies])
-        snapshot.appendItems(self.movies, toSection: .movies)
-        diffable.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
+            snapshot.appendSections([.movies])
+            snapshot.appendItems(self.movies, toSection: .movies)
+            self.diffable.apply(snapshot, animatingDifferences: true)
+        }
     }
 
     func update(with movies: [MoviePreviewModel], shouldReset: Bool = false) {
@@ -41,12 +44,15 @@ final class MoviesDataSource {
             self.movies.append(contentsOf: movies)
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
-        snapshot.appendSections([.movies])
-        snapshot.appendItems(self.movies, toSection: .movies)
-        diffable.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
+            snapshot.appendSections([.movies])
+            snapshot.appendItems(self.movies, toSection: .movies)
+            self.diffable.apply(snapshot, animatingDifferences: true)
+        }
     }
-    
+
     func updateForSearch(with movies: [MoviePreviewModel], shouldReset: Bool = false) {
         if shouldReset {
             self.searchedMovies = movies
@@ -54,9 +60,13 @@ final class MoviesDataSource {
             self.searchedMovies.append(contentsOf: movies)
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
-        snapshot.appendSections([.movies])
-        snapshot.appendItems(self.searchedMovies, toSection: .movies)
-        diffable.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            var snapshot = NSDiffableDataSourceSnapshot<SectionModel, MoviePreviewModel>()
+            snapshot.appendSections([.movies])
+            snapshot.appendItems(self.searchedMovies, toSection: .movies)
+            self.diffable.apply(snapshot, animatingDifferences: true)
+        }
     }
+
 }

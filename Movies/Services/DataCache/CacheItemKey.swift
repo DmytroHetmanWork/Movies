@@ -9,4 +9,5 @@ import Foundation
 
 enum CacheItemKey: String {
     case movieGenresList
+    case moviesDownloaded
 }
