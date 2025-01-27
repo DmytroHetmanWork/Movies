@@ -10,7 +10,6 @@ import UIKit
 protocol MoviesListView: AnyObject {
     var moviesTableView: UITableView { get }
     
-    func setupDatasource()
     func reloadData()
     func endRefreshing()
     func showLoadingFooter()
@@ -21,6 +20,8 @@ protocol MoviesListView: AnyObject {
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
+    
+    // MARK: - Const
     
     enum C {
         static let sortBtnImage = UIImage(systemName: "arrow.up.arrow.down")?
@@ -151,7 +152,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         emptyTableLabel.isHidden = true
     }
     
-    func setupDatasource() {
+    private func setupDatasource() {
         presenter.setupDatasource()
     }
     
@@ -250,6 +251,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         }
     }
     
+    // MARK: - Network connection
+    
     private func checkConnection(completion: (Bool) -> Void) {
         if !NetworkListener.shared.isReachable {
             completion(false)
@@ -260,6 +263,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
 }
 
+    // MARK: - TableView Delegate
 
 extension MoviesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -276,6 +280,8 @@ extension MoviesListViewController: UITableViewDelegate {
         }
     }
 }
+
+// MARK: - SearchBar Delegate
 
 extension MoviesListViewController: UISearchBarDelegate {
     

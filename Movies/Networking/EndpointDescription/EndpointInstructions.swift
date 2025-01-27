@@ -66,7 +66,11 @@ struct SearchMovieList: NetworkRequestBodyConvertible {
 
 struct MovieGenres: NetworkRequestBodyConvertible {
     
-    var language: AvailableLanguages
+    let language: AvailableLanguages
+    
+    init(language: AvailableLanguages = .enUS) {
+        self.language = language
+    }
     
     var data: Data? { nil }
     var queryItems: [URLQueryItem]? {

@@ -31,6 +31,8 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         case movies
     }
     
+    // MARK: - Current state values
+    
     private(set) var currentSortBy: SortMoviesOption = .popularityDesc
     private var moviesListStatus = PageStatusModel()
     private var searchedMoviesStatus = PageStatusModel()
@@ -45,6 +47,8 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     
+    // MARK: - Searching state values
+    
     private var isSearching = false
     private var queryText = "" {
         didSet {
@@ -54,17 +58,27 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     private var debounceTimer: Timer?
     private let debounceDelay: TimeInterval = 0
     
+    // MARK: - Private properties
+    
     private var networkService: AlamoNetworkingServiceProtocol
     private var dataSource: MoviesDataSource!
     
+    // MARK: - View
+    
     weak var moviesListView: MoviesListView!
     
+    // MARK: - Flow handlers
+    
     var didSelectMovieWithId: ((Int) -> Void)?
+    
+    // MARK: - Initializer
     
     init(networkService: AlamoNetworkingServiceProtocol) {
         self.networkService = networkService
         
     }
+    
+    // MARK: - Functions
     
     func setupDatasource() {
         dataSource = MoviesDataSource(tableView: moviesListView.moviesTableView)
@@ -91,50 +105,6 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             }
         }
         
-    }
-    
-    private func initialLoading() {
-        loadMore(isRefreshing: true) { [weak self] result in
-            switch result {
-            case .success():
-                self?.moviesListView.configEmptyTableState(isShowing: false)
-            case .failure(let error):
-                self?.moviesListView.showNetworkError(error)
-            }
-            self?.moviesListView.endRefreshing()
-        }
-    }
-    
-    private func loadMoviesGenres(_ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
-        networkService
-            .perform(
-                .get,
-                MoviesEndpoint.movieGenresList,
-                MovieGenres(language: .enUS),
-                completion: { result in
-                
-                    switch result {
-                    case .data(let data):
-                        guard let data,
-                              let genresResults = try? JSONDecoder().decode(GenresListDTO.self, from: data)
-                        else { return }
-                        
-                        do {
-                            let encodedData = try JSONEncoder().encode(genresResults.genres)
-                            DataCache.instance.write(data: encodedData, forKey: CacheItemKey.movieGenresList.rawValue)
-                            completion?(.success(()))
-                        } catch {
-                            print("Failed to encode genres: \(error.localizedDescription)")
-                            completion?(.failure(.failedToDecodeGenres))
-                        }
-
-                    case .error(let networkError):
-                        print("func to show \(networkError) alert")
-                        completion?(.failure(networkError))
-                    }
-                    
-                }
-            )
     }
     
     func loadMore(isRefreshing: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
@@ -200,6 +170,107 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     
+    func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
+        if isSearching {
+            resetSearchedPageStats()
+            
+            search(by: queryText, isRefreshing: true, completion: { [weak self]_ in
+                self?.moviesListView.endRefreshing()
+            })
+        } else {
+            resetPageStats()
+            
+            if let newSorting {
+                currentSortBy = newSorting
+            }
+            
+            loadMore(isRefreshing: true) { [weak self] result in
+                switch result {
+                case .success(_):
+                    break
+                case .failure(let error):
+                    self?.moviesListView.showNetworkError(error)
+                }
+                self?.moviesListView.endRefreshing()
+            }
+        }
+    }
+    
+    // MARK: - Pagination
+    
+    func checkWhenToLoad(on indexPath: IndexPath) {
+        if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
+            let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
+            if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 3 == indexPath.row {
+                if NetworkListener.shared.isReachable {
+                    if isSearching {
+                        search(by: queryText, completion: { _ in })
+                    } else {
+                        loadMore()
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Interaction with cell
+    
+    func retrieveMovieIdToShow(by row: Int) {
+        let movieId = isSearching ? dataSource.searchedMovies[row].id  : dataSource.movies[row].id
+        didSelectMovieWithId?(movieId)
+    }
+    
+    // MARK: - Cache
+    
+    func showCachedItems() {
+        applyCachedMovies()
+    }
+    
+    // MARK: - Private functions
+    
+    private func initialLoading() {
+        loadMore(isRefreshing: true) { [weak self] result in
+            switch result {
+            case .success():
+                self?.moviesListView.configEmptyTableState(isShowing: false)
+            case .failure(let error):
+                self?.moviesListView.showNetworkError(error)
+            }
+            self?.moviesListView.endRefreshing()
+        }
+    }
+    
+    private func loadMoviesGenres(_ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
+        networkService
+            .perform(
+                .get,
+                MoviesEndpoint.movieGenresList,
+                MovieGenres(),
+                completion: { result in
+                
+                    switch result {
+                    case .data(let data):
+                        guard let data,
+                              let genresResults = try? JSONDecoder().decode(GenresListDTO.self, from: data)
+                        else { return }
+                        
+                        do {
+                            let encodedData = try JSONEncoder().encode(genresResults.genres)
+                            DataCache.instance.write(data: encodedData, forKey: CacheItemKey.movieGenresList.rawValue)
+                            completion?(.success(()))
+                        } catch {
+                            print("Failed to encode genres: \(error.localizedDescription)")
+                            completion?(.failure(.failedToDecodeGenres))
+                        }
+
+                    case .error(let networkError):
+                        completion?(.failure(networkError))
+                    }
+                    
+                }
+            )
+    }
+    
     private func searchInOfflineMode(for text: String) {
         
         isSearching = true
@@ -234,7 +305,8 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             return
         }
 
-        networkService.perform(
+        networkService
+            .perform(
             .get,
             endpoint,
             parameters,
@@ -250,66 +322,15 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                         shouldReset: shouldReset,
                         isSearching: isSearch
                     )
-                    print("loaded first portion")
                     completion?(.success(()))
                     
                 case .error(let error):
                     completion?(.failure(error))
                 }
+                
                 isLoadingMovies = false
-                print("after loading: \(isLoadingMovies)")
             }
         )
-    }
-    
-    func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
-        if isSearching {
-            resetSearchedPageStats()
-            
-            search(by: queryText, isRefreshing: true, completion: { [weak self]_ in
-                self?.moviesListView.endRefreshing()
-            })
-        } else {
-            resetPageStats()
-            
-            if let newSorting {
-                currentSortBy = newSorting
-            }
-            
-            loadMore(isRefreshing: true) { [weak self] result in
-                switch result {
-                case .success(_):
-                    break
-                case .failure(let error):
-                    print("func to show \(error) alert")
-                }
-                self?.moviesListView.endRefreshing()
-            }
-        }
-    }
-    
-    func checkWhenToLoad(on indexPath: IndexPath) {
-        if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
-            let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
-            if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 3 == indexPath.row {
-                if NetworkListener.shared.isReachable {
-                    if isSearching {
-                        search(by: queryText, completion: { _ in })
-                    } else {
-                        loadMore()
-                    }
-                }
-            }
-        }
-    }
-    
-    func retrieveMovieIdToShow(by row: Int) {
-        let movieId = isSearching ? dataSource.searchedMovies[row].id  : dataSource.movies[row].id
-        didSelectMovieWithId?(movieId)
-    }
-    
-    func showCachedItems() {
-        applyCachedMovies()
     }
     
     private func applyCachedMovies() {
@@ -326,35 +347,35 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
 }
 
 // MARK: - Helpers to reset values
+
 private extension MoviesListPresenter {
     
-    private func resetSearch() {
+    func resetSearch() {
         isSearching = false
         resetSearchedPageStats()
         moviesListView.reloadData()
-        print("reloaded data after empty string")
-        print(dataSource.diffable.snapshot().itemIdentifiers(inSection: .movies))
     }
     
-    private func resetPageStats() {
+    func resetPageStats() {
         moviesListStatus.reset()
     }
     
-    private func incrementTotalLoadedPage() {
+    func incrementTotalLoadedPage() {
         moviesListStatus.totalLoadedPages += 1
     }
     
-    private func resetSearchedPageStats() {
+    func resetSearchedPageStats() {
         searchedMoviesStatus.reset()
     }
     
-    private func incrementTotalLoadedSearchedPage() {
+    func incrementTotalLoadedSearchedPage() {
         searchedMoviesStatus.totalLoadedPages += 1
     }
     
 }
 
 // MARK: - Helpers update state
+
 private extension MoviesListPresenter {
     func updateState(
         with model: MoviesListDTO,
@@ -385,7 +406,7 @@ private extension MoviesListPresenter {
         }
     }
 
-    private func loadGenres() -> [GenreItemDTO]? {
+    func loadGenres() -> [GenreItemDTO]? {
         guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
               let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data) else {
             return nil
@@ -393,7 +414,7 @@ private extension MoviesListPresenter {
         return genres
     }
 
-    private func loadCachedMovies() -> [MoviePreviewModel] {
+    func loadCachedMovies() -> [MoviePreviewModel] {
         guard let cachedData = DataCache.instance.readData(forKey: CacheItemKey.moviesDownloaded.rawValue),
               let movies = try? JSONDecoder().decode([MoviePreviewModel].self, from: cachedData) else {
             return []
@@ -401,13 +422,13 @@ private extension MoviesListPresenter {
         return movies
     }
 
-    private func cacheMovies(_ movies: [MoviePreviewModel]) {
+    func cacheMovies(_ movies: [MoviePreviewModel]) {
         if let cachedData = try? JSONEncoder().encode(movies) {
             DataCache.instance.write(data: cachedData, forKey: CacheItemKey.moviesDownloaded.rawValue)
         }
     }
 
-    private func prepareMovies(
+    func prepareMovies(
         from results: [MovieItemDTO],
         genres: [GenreItemDTO],
         isSearching: Bool,
@@ -428,11 +449,11 @@ private extension MoviesListPresenter {
         }
     }
 
-    private func updateViewState(for model: MoviesListDTO, isSearching: Bool) {
+    func updateViewState(for model: MoviesListDTO, isSearching: Bool) {
         moviesListView?.configEmptyTableState(isShowing: model.results.isEmpty)
     }
     
-    private func updateSearchState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+    func updateSearchState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
         dataSource.updateForSearch(with: movies, shouldReset: shouldReset)
         moviesListView.reloadData()
         
@@ -443,7 +464,7 @@ private extension MoviesListPresenter {
         incrementTotalLoadedSearchedPage()
     }
 
-    private func updateRegularState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+    func updateRegularState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
         dataSource.update(with: movies, shouldReset: shouldReset)
         moviesListView.reloadData()
         
