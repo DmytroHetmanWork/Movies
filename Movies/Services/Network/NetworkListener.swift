@@ -8,14 +8,14 @@
 import Alamofire
 
 final class NetworkListener {
-    
     static let shared = NetworkListener()
     
     private var connectionBackClosure: (() -> Void)?
     private var connectionLostClosure: (() -> Void)?
+    private var retryQueue: [() -> Void] = []
     private var pollingTimer: Timer?
     
-    var isReachable: Bool = false /// Flag to track internet connectivity
+    var isReachable: Bool = false
     
     private let reachabilityManager = NetworkReachabilityManager(host: "www.google.com")
     
@@ -29,19 +29,16 @@ final class NetworkListener {
             case .reachable(.ethernetOrWiFi), .reachable(.cellular):
                 self?.handleReconnection()
             case .notReachable:
-                // This may not always trigger consistently
                 self?.handleConnectionLoss()
             case .unknown:
                 break
             }
         }
         
-        // Start polling in case `.notReachable` doesn't trigger
-        startPolling()
+        startPolling() // Polling in case `.notReachable` doesn't trigger
     }
     
     private func handleConnectionLoss() {
-        // Stop polling if already handled
         guard isReachable else { return }
         
         isReachable = false
@@ -50,11 +47,19 @@ final class NetworkListener {
     }
     
     private func handleReconnection() {
-        guard !isReachable else { return } // Only trigger if it was previously unreachable
+        guard !isReachable else { return }
         
         isReachable = true
         connectionBackClosure?()
-        print("Internet reconnected.")
+        print("Internet reconnected. Executing retry queue.")
+        
+        // Execute and clear retryable tasks
+        retryQueue.forEach { $0() }
+        retryQueue.removeAll()
+    }
+    
+    func addRetryableTask(_ task: @escaping () -> Void) {
+        retryQueue.append(task)
     }
     
     func setConnectionLostClosure(_ closure: (() -> Void)?) {
@@ -90,3 +95,4 @@ final class NetworkListener {
         reachabilityManager?.stopListening()
     }
 }
+

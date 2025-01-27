@@ -16,6 +16,8 @@ protocol MoviesListView: AnyObject {
     func showLoadingFooter()
     func hideLoadingFooter()
     func configEmptyTableState(isShowing: Bool)
+    func showNetworkLostAlert()
+    func showNetworkError(_ error: NetworkError)
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
@@ -73,8 +75,6 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -88,8 +88,6 @@ final class MoviesListViewController: UIViewController, MoviesListView {
 
     private func setupUI() {
         view.backgroundColor = .white
-        
-        
         
         setupNavigationBar()
         setupLayout()
@@ -183,6 +181,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
             if isConnected {
                 presenter.refreshMovies(withNewSorting: nil)
             } else {
+                presenter.showCachedItems()
                 endRefreshing()
             }
         }
@@ -204,6 +203,18 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         emptyTableLabel.isHidden = !isShowing
     }
     
+    func showNetworkLostAlert() {
+        showAlert(error: NetworkError.youAreOffline, okAction: { [weak self] in
+            DispatchQueue.main.async {
+                self?.endRefreshing()
+            }
+        })
+    }
+    
+    func showNetworkError(_ error: NetworkError) {
+        showAlert(error: error)
+    }
+    
     // MARK: - Sorting
     
     @objc private func tappedOnSort() {
@@ -222,7 +233,6 @@ final class MoviesListViewController: UIViewController, MoviesListView {
                         style: .default,
                         handler: { [weak self] _ in
                             self?.presenter.refreshMovies(withNewSorting: option)
-                            self?.labelTitle.text = option.navigationTitle
                         }
                     )
                     if isSelected {
@@ -234,14 +244,14 @@ final class MoviesListViewController: UIViewController, MoviesListView {
                 alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
                 
                 present(alert, animated: true, completion: nil)
+            } else {
+                showNetworkLostAlert()
             }
         }
     }
     
     private func checkConnection(completion: (Bool) -> Void) {
         if !NetworkListener.shared.isReachable {
-            endRefreshing()
-            showAlert(error: NetworkError.youAreOffline)
             completion(false)
         } else {
             completion(true)
@@ -260,6 +270,8 @@ extension MoviesListViewController: UITableViewDelegate {
         checkConnection { isConnected in
             if isConnected {
                 presenter.retrieveMovieIdToShow(by: indexPath.row)
+            } else {
+                showNetworkLostAlert()
             }
         }
     }

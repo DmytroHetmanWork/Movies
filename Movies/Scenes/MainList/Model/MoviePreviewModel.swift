@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct MoviePreviewModel: Hashable {
+struct MoviePreviewModel: Hashable, Codable {
     let id: Int
     let title: String
     let year: String

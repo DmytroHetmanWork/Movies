@@ -21,6 +21,8 @@ protocol MoviesListPresenterProtocol: AnyObject {
     
     func retrieveMovieIdToShow(by row: Int)
     var didSelectMovieWithId: ((Int) -> Void)? { get set }
+    
+    func showCachedItems()
 }
 
 final class MoviesListPresenter: MoviesListPresenterProtocol {
@@ -67,29 +69,37 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     func setupDatasource() {
         dataSource = MoviesDataSource(tableView: moviesListView.moviesTableView)
         moviesListView.moviesTableView.dataSource = dataSource.diffable
-        
+    
         if DataCache.instance.hasData(forKey: CacheItemKey.movieGenresList.rawValue) {
-            initialLoading()
+            self.initialLoading()
         } else {
-            loadMoviesGenres { [weak self] result in
+            self.loadMoviesGenres { [weak self] result in
                 switch result {
                 case .success(_):
                     self?.initialLoading()
                 case .failure(let error):
-                    print("func to show \(error) alert")
+                    self?.moviesListView.showNetworkError(error)
+                    
+                    NetworkListener.shared.addRetryableTask { [weak self] in
+                        self?.setupDatasource()
+                    }
+                }
+                
+                if !NetworkListener.shared.isReachable {
+                    self?.moviesListView.showNetworkLostAlert()
                 }
             }
         }
+        
     }
     
     private func initialLoading() {
-        
         loadMore(isRefreshing: true) { [weak self] result in
             switch result {
-            case .success(_):
-                break
+            case .success():
+                self?.moviesListView.configEmptyTableState(isShowing: false)
             case .failure(let error):
-                print("func to show \(error) alert")
+                self?.moviesListView.showNetworkError(error)
             }
             self?.moviesListView.endRefreshing()
         }
@@ -128,19 +138,23 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     func loadMore(isRefreshing: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
-        guard !isLoadingMovies else { return }
-        isLoadingMovies = true
-        
-        loadMovies(
-            endpoint: .discoverMovie,
-            parameters: DiscoverMoviesList(
-                page: moviesListStatus.nextPageToLoad,
-                sortBy: currentSortBy
-            ),
-            shouldReset: isRefreshing,
-            isSearch: false,
-            completion: completion
-        )
+        if !NetworkListener.shared.isReachable {
+            applyCachedMovies()
+        } else {
+            guard !isLoadingMovies else { return }
+            isLoadingMovies = true
+            
+            loadMovies(
+                endpoint: .discoverMovie,
+                parameters: DiscoverMoviesList(
+                    page: moviesListStatus.nextPageToLoad,
+                    sortBy: currentSortBy
+                ),
+                shouldReset: isRefreshing,
+                isSearch: false,
+                completion: completion
+            )
+        }
     }
 
     func search(by text: String, isRefreshing: Bool = false, completion: @escaping (Result<(), NetworkError>) -> Void) {
@@ -278,10 +292,12 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         if dataSource.diffable.snapshot().numberOfSections - 1 == indexPath.section {
             let currentSection = dataSource.diffable.snapshot().sectionIdentifiers[indexPath.section]
             if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 3 == indexPath.row {
-                if isSearching {
-                    search(by: queryText, completion: { _ in })
-                } else {
-                    loadMore()
+                if NetworkListener.shared.isReachable {
+                    if isSearching {
+                        search(by: queryText, completion: { _ in })
+                    } else {
+                        loadMore()
+                    }
                 }
             }
         }
@@ -290,6 +306,21 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     func retrieveMovieIdToShow(by row: Int) {
         let movieId = isSearching ? dataSource.searchedMovies[row].id  : dataSource.movies[row].id
         didSelectMovieWithId?(movieId)
+    }
+    
+    func showCachedItems() {
+        applyCachedMovies()
+    }
+    
+    private func applyCachedMovies() {
+        let cachedMovies = loadCachedMovies()
+        guard !cachedMovies.isEmpty else {
+            moviesListView.configEmptyTableState(isShowing: cachedMovies.isEmpty)
+            return
+        }
+        
+        dataSource.update(with: cachedMovies, shouldReset: true)
+        moviesListView.reloadData()
     }
     
 }
@@ -331,31 +362,77 @@ private extension MoviesListPresenter {
         isSearching: Bool = false
     ) {
         if isSearching {
-            moviesListView?.configEmptyTableState(isShowing: model.results.isEmpty)
+            updateViewState(for: model, isSearching: true)
         }
         
-        guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
-              let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data)
-        else { return }
+        guard let genres = loadGenres() else { return }
+        var cachedMovies = loadCachedMovies()
         
-        let movies = model.results.compactMap {
-            let newValue = MoviePreviewModel(from: $0, genres: genres)
-            let moviesList = isSearching ? dataSource.searchedMovies : dataSource.movies
-            if let newValue, (!moviesList.contains(newValue) || shouldReset) {
-                return newValue
-            }
-            return nil
-        }
+        let movies = prepareMovies(
+            from: model.results,
+            genres: genres,
+            isSearching: isSearching,
+            shouldReset: shouldReset,
+            cachedMovies: &cachedMovies
+        )
+        
+        cacheMovies(cachedMovies)
         
         if isSearching {
             updateSearchState(with: model, movies: movies, shouldReset: shouldReset)
         } else {
             updateRegularState(with: model, movies: movies, shouldReset: shouldReset)
         }
-        
+    }
+
+    private func loadGenres() -> [GenreItemDTO]? {
+        guard let data = DataCache.instance.readData(forKey: CacheItemKey.movieGenresList.rawValue),
+              let genres = try? JSONDecoder().decode([GenreItemDTO].self, from: data) else {
+            return nil
+        }
+        return genres
+    }
+
+    private func loadCachedMovies() -> [MoviePreviewModel] {
+        guard let cachedData = DataCache.instance.readData(forKey: CacheItemKey.moviesDownloaded.rawValue),
+              let movies = try? JSONDecoder().decode([MoviePreviewModel].self, from: cachedData) else {
+            return []
+        }
+        return movies
+    }
+
+    private func cacheMovies(_ movies: [MoviePreviewModel]) {
+        if let cachedData = try? JSONEncoder().encode(movies) {
+            DataCache.instance.write(data: cachedData, forKey: CacheItemKey.moviesDownloaded.rawValue)
+        }
+    }
+
+    private func prepareMovies(
+        from results: [MovieItemDTO],
+        genres: [GenreItemDTO],
+        isSearching: Bool,
+        shouldReset: Bool,
+        cachedMovies: inout [MoviePreviewModel]
+    ) -> [MoviePreviewModel] {
+        return results.compactMap {
+            let newValue = MoviePreviewModel(from: $0, genres: genres)
+            let moviesList = isSearching ? dataSource.searchedMovies : dataSource.movies
+            
+            if let newValue, (!moviesList.contains(newValue) || shouldReset) {
+                if !cachedMovies.contains(newValue) {
+                    cachedMovies.append(newValue)
+                }
+                return newValue
+            }
+            return nil
+        }
+    }
+
+    private func updateViewState(for model: MoviesListDTO, isSearching: Bool) {
+        moviesListView?.configEmptyTableState(isShowing: model.results.isEmpty)
     }
     
-    func updateSearchState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+    private func updateSearchState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
         dataSource.updateForSearch(with: movies, shouldReset: shouldReset)
         moviesListView.reloadData()
         
@@ -366,7 +443,7 @@ private extension MoviesListPresenter {
         incrementTotalLoadedSearchedPage()
     }
 
-    func updateRegularState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
+    private func updateRegularState(with model: MoviesListDTO, movies: [MoviePreviewModel], shouldReset: Bool) {
         dataSource.update(with: movies, shouldReset: shouldReset)
         moviesListView.reloadData()
         
