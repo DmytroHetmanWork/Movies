@@ -33,6 +33,7 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        movieDetailsView.delegate = self
         presenter.attachView(self)
         setupNavigationBar()
     }
@@ -65,3 +66,13 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
     
 }
 
+extension MovieDetailsViewController: MovieDetailsCallZoomViewDelegate {
+    func showFull(_ image: UIImage?) {
+        guard image != .imageCellBackPlaceholder else { return }
+        let zoomVC = ZoomViewController(image: image)
+        zoomVC.modalPresentationStyle = .pageSheet
+        present(zoomVC, animated: true)
+    }
+    
+    
+}

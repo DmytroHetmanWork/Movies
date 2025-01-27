@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol MovieDetailsCallZoomViewDelegate: AnyObject {
+    func showFull(_ image: UIImage?)
+}
+
 final class MovieDetailsView: UIView {
     
     // MARK: - Views
@@ -77,6 +81,10 @@ final class MovieDetailsView: UIView {
     
     private var shimmerViews: [UIView] = []
     
+    // MARK: - Delegates
+    
+    weak var delegate: MovieDetailsCallZoomViewDelegate?
+    
     // MARK: - Initializers
     
     override init(frame: CGRect) {
@@ -95,6 +103,17 @@ final class MovieDetailsView: UIView {
         backgroundColor = .white
         addSubviews()
         setupLayout()
+        setupGestures()
+    }
+    
+    private func setupGestures() {
+        let tapOnImage = UITapGestureRecognizer(target: self, action: #selector(tappedOnImage))
+        imageView.addGestureRecognizer(tapOnImage)
+        imageView.isUserInteractionEnabled = true
+    }
+    
+    @objc private func tappedOnImage() {
+        delegate?.showFull(imageView.image)
     }
     
     private func addSubviews() {

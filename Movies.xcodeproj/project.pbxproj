@@ -45,6 +45,7 @@
 		934A70572D46B6010079067B /* MovieDetailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70562D46B6010079067B /* MovieDetailsModel.swift */; };
 		934A70592D46C2500079067B /* DataCache+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70582D46C2480079067B /* DataCache+Extension.swift */; };
 		934A705B2D46E06B0079067B /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A705A2D46E06B0079067B /* ShimmerView.swift */; };
+		934A705E2D4709470079067B /* ZoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A705D2D4709470079067B /* ZoomViewController.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -91,6 +92,7 @@
 		934A70562D46B6010079067B /* MovieDetailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailsModel.swift; sourceTree = "<group>"; };
 		934A70582D46C2480079067B /* DataCache+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataCache+Extension.swift"; sourceTree = "<group>"; };
 		934A705A2D46E06B0079067B /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
+		934A705D2D4709470079067B /* ZoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomViewController.swift; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -267,6 +269,14 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		934A705C2D4709400079067B /* Zoom */ = {
+			isa = PBXGroup;
+			children = (
+				934A705D2D4709470079067B /* ZoomViewController.swift */,
+			);
+			path = Zoom;
+			sourceTree = "<group>";
+		};
 		937391B52D41A7DD0036EDED /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -405,6 +415,7 @@
 		937391C42D41A90F0036EDED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				934A705C2D4709400079067B /* Zoom */,
 				934A70522D469A5C0079067B /* Subviews */,
 				934A704C2D4624410079067B /* MovieDetailsViewController.swift */,
 			);
@@ -554,6 +565,7 @@
 				934A703E2D43E33A0079067B /* PaddingLabel.swift in Sources */,
 				934A705B2D46E06B0079067B /* ShimmerView.swift in Sources */,
 				934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */,
+				934A705E2D4709470079067B /* ZoomViewController.swift in Sources */,
 				934A703A2D43ADB50079067B /* NetworkResult.swift in Sources */,
 				934A70542D469A650079067B /* MovieDetailsView.swift in Sources */,
 				934A704D2D4624410079067B /* MovieDetailsViewController.swift in Sources */,
