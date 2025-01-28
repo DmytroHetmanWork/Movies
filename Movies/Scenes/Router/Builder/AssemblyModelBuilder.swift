@@ -8,12 +8,13 @@
 import UIKit
 
 protocol AssemblyBuilderProtocol {
-    func createMoviesModule(router: RouterProtocol) -> UIViewController
-    func createMoviesDetails(by id: Int, router: RouterProtocol) -> UIViewController
+    func createMoviesModule(router: RouterProtocol) -> MoviesListView
+    func createMoviesDetails(by id: Int, router: RouterProtocol) -> MovieDetailsViewProtocol
+    func createTrailerPlayer(by videoID: YouTubeVideoID) -> UIViewController
 }
 
 final class AssemblyModelBuilder: AssemblyBuilderProtocol {
-    func createMoviesModule(router: RouterProtocol) -> UIViewController {
+    func createMoviesModule(router: RouterProtocol) -> MoviesListView {
         let presenter = MoviesListPresenter(
             networkService: AlamoNetworking<MoviesEndpoint>(
                 APIHost.themoviedb,
@@ -27,7 +28,7 @@ final class AssemblyModelBuilder: AssemblyBuilderProtocol {
         return view
     }
     
-    func createMoviesDetails(by id: Int, router: RouterProtocol) -> UIViewController {
+    func createMoviesDetails(by id: Int, router: RouterProtocol) -> MovieDetailsViewProtocol {
         let presenter = MovieDetailsPresenter(
             movieID: id,
             networkService: AlamoNetworking<MovieDetailsEndpoint>(
@@ -36,7 +37,15 @@ final class AssemblyModelBuilder: AssemblyBuilderProtocol {
             )
         )
         
+        presenter.didRequestTrailer = { id in
+            router.showTrailer(by: id)
+        }
         let view = MovieDetailsViewController(presenter: presenter)
+        return view
+    }
+    
+    func createTrailerPlayer(by videoID: YouTubeVideoID) -> UIViewController {
+        let view = YouTubePlayerViewController(id: videoID)
         return view
     }
 }

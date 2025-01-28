@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol MoviesListView: AnyObject {
+protocol MoviesListView: AnyObject, UIViewController {
     var moviesTableView: UITableView { get }
     
     func reloadData()

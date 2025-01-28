@@ -9,10 +9,10 @@ import Foundation
 import DataCache
 
 protocol MovieDetailsPresenterProtocol: AnyObject {
-
     func attachView(_ view: MovieDetailsViewProtocol)
-    func viewDidLoad()
     
+    func showTrailer()
+    var didRequestTrailer: ((YouTubeVideoID) -> Void)? { get set }
 }
 
 final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
@@ -22,7 +22,10 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
     private weak var view: MovieDetailsViewProtocol?
     
     private var movie: MovieDetailsModel?
+    private var trailer: MovieTrailerModel?
     private var networkService: AlamoNetworkingServiceProtocol
+    
+    var didRequestTrailer: ((YouTubeVideoID) -> Void)?
     
     var navigationTitle: String {
         movie?.title ?? ""
@@ -67,21 +70,68 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
                         
                         self?.movie = details.parseToModel()
                         
-                        self?.viewDidLoad()
+                        self?.loadTrailerDetails(for: "\(details.id)") { result in
+                            switch result {
+                            case .success():
+                                self?.viewDidLoad()
+                                completion(.success(()))
+                            case .failure(let networkError):
+                                completion(.failure(networkError))
+                            }
+                        }
                         
-                        completion(.success(()))
                     case .error(let networkError):
-                        print(networkError)
+                        completion(.failure(networkError))
                     }
             })
     }
     
-    func viewDidLoad() {
+    private func loadTrailerDetails(for id: String, completion: @escaping (Result<(), NetworkError>) -> Void) {
+        AlamoNetworking<MovieVideosEndpoint>(APIHost.themoviedb, headers: MoviesAPIHeader.value)
+            .perform(
+                .get,
+                MovieVideosEndpoint(id: id),
+                MovieVideos(),
+                completion: { [weak self] result in
+                
+                    switch result {
+                    case .data(let data):
+                        guard let data else {
+                            completion(.failure(.noData))
+                            return
+                        }
+                              
+                        guard let trailer = try? JSONDecoder().decode(MovieVideosListDTO.self, from: data) else {
+                            completion(.failure(.apiIssue))
+                            return
+                        }
+                        
+                        self?.trailer = trailer.getTrailerModel()
+                        
+                        completion(.success(()))
+                    case .error(let networkError):
+                        completion(.failure(networkError))
+                    }
+            })
+    }
+    
+    private func viewDidLoad() {
         DispatchQueue.main.async { [weak self] in
             guard let self, let movie else { return }
             view?.display(movie)
             view?.updateNavigationTitle(navigationTitle)
+            view?.setupTrailerButton(trailer != nil)
         }
     }
+    
+    func showTrailer() {
+        guard let trailer else {
+            view?.showAlert(.noData)
+            return
+        }
+        
+        didRequestTrailer?(YouTubeVideoID(value: "\(trailer.id)"))
+    }
+    
 }
 

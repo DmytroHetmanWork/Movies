@@ -51,6 +51,10 @@
 		934A70652D471D650079067B /* AlertError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70642D471D600079067B /* AlertError.swift */; };
 		934A70672D4725F10079067B /* UINavigationController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70662D4725E80079067B /* UINavigationController+Extension.swift */; };
 		934A706A2D4855E10079067B /* LocalizedKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70692D4855E10079067B /* LocalizedKey.swift */; };
+		934A706C2D487D780079067B /* MovieVideosListDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A706B2D487D6A0079067B /* MovieVideosListDTO.swift */; };
+		934A706E2D4880AA0079067B /* MovieTrailerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A706D2D4880A50079067B /* MovieTrailerModel.swift */; };
+		934A70732D488CAF0079067B /* YouTubePlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70722D488CAF0079067B /* YouTubePlayerViewController.swift */; };
+		934A70752D488D540079067B /* YouTubeVideoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A70742D488D4C0079067B /* YouTubeVideoID.swift */; };
 		937391CC2D41AC750036EDED /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 937391CB2D41AC750036EDED /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -103,6 +107,10 @@
 		934A70642D471D600079067B /* AlertError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertError.swift; sourceTree = "<group>"; };
 		934A70662D4725E80079067B /* UINavigationController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extension.swift"; sourceTree = "<group>"; };
 		934A70692D4855E10079067B /* LocalizedKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedKey.swift; sourceTree = "<group>"; };
+		934A706B2D487D6A0079067B /* MovieVideosListDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieVideosListDTO.swift; sourceTree = "<group>"; };
+		934A706D2D4880A50079067B /* MovieTrailerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieTrailerModel.swift; sourceTree = "<group>"; };
+		934A70722D488CAF0079067B /* YouTubePlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouTubePlayerViewController.swift; sourceTree = "<group>"; };
+		934A70742D488D4C0079067B /* YouTubeVideoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouTubeVideoID.swift; sourceTree = "<group>"; };
 		937391CB2D41AC750036EDED /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -277,6 +285,7 @@
 		934A70552D46B5F70079067B /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				934A706D2D4880A50079067B /* MovieTrailerModel.swift */,
 				934A70562D46B6010079067B /* MovieDetailsModel.swift */,
 			);
 			path = Model;
@@ -306,6 +315,31 @@
 			path = Localization;
 			sourceTree = "<group>";
 		};
+		934A706F2D488C1E0079067B /* YouTubePlayer */ = {
+			isa = PBXGroup;
+			children = (
+				934A70772D4891670079067B /* View */,
+				934A70762D48915E0079067B /* Model */,
+			);
+			path = YouTubePlayer;
+			sourceTree = "<group>";
+		};
+		934A70762D48915E0079067B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				934A70742D488D4C0079067B /* YouTubeVideoID.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		934A70772D4891670079067B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				934A70722D488CAF0079067B /* YouTubePlayerViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		937391B52D41A7DD0036EDED /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -322,6 +356,7 @@
 			children = (
 				934A70252D41EB900079067B /* Router */,
 				937391BD2D41A8CC0036EDED /* Common */,
+				934A706F2D488C1E0079067B /* YouTubePlayer */,
 				937391BC2D41A8BD0036EDED /* Details */,
 				937391BB2D41A8AF0036EDED /* MainList */,
 			);
@@ -419,6 +454,7 @@
 		937391C02D41A8DE0036EDED /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				934A706B2D487D6A0079067B /* MovieVideosListDTO.swift */,
 				934A70502D4628D00079067B /* MovieDetailsItemDTO.swift */,
 				934A703B2D43B3260079067B /* GenresListDTO.swift */,
 				934A700C2D41B7940079067B /* MoviesListDTO.swift */,
@@ -577,6 +613,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934A70752D488D540079067B /* YouTubeVideoID.swift in Sources */,
 				934A70282D41EBB10079067B /* AssemblyModelBuilder.swift in Sources */,
 				934A70382D43AB280079067B /* String+Extension.swift in Sources */,
 				934A70492D4438740079067B /* PageStatusModel.swift in Sources */,
@@ -597,8 +634,10 @@
 				934A70222D41CF570079067B /* NetworkRequestBodyConvertible.swift in Sources */,
 				934A703E2D43E33A0079067B /* PaddingLabel.swift in Sources */,
 				934A705B2D46E06B0079067B /* ShimmerView.swift in Sources */,
+				934A706C2D487D780079067B /* MovieVideosListDTO.swift in Sources */,
 				934A706A2D4855E10079067B /* LocalizedKey.swift in Sources */,
 				934A70152D41BD390079067B /* EndpointInstructions.swift in Sources */,
+				934A70732D488CAF0079067B /* YouTubePlayerViewController.swift in Sources */,
 				934A705E2D4709470079067B /* ZoomViewController.swift in Sources */,
 				934A703A2D43ADB50079067B /* NetworkResult.swift in Sources */,
 				934A70542D469A650079067B /* MovieDetailsView.swift in Sources */,
@@ -613,6 +652,7 @@
 				934A70592D46C2500079067B /* DataCache+Extension.swift in Sources */,
 				934A70452D43F9C90079067B /* CacheItemKey.swift in Sources */,
 				934A70242D41EB4A0079067B /* Router.swift in Sources */,
+				934A706E2D4880AA0079067B /* MovieTrailerModel.swift in Sources */,
 				934A704F2D4624540079067B /* MovieDetailsPresenter.swift in Sources */,
 				934A70132D41BCB30079067B /* APIHost.swift in Sources */,
 				934A70512D4628DB0079067B /* MovieDetailsItemDTO.swift in Sources */,

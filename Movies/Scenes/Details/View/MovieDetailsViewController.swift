@@ -7,9 +7,13 @@
 
 import UIKit
 
-protocol MovieDetailsViewProtocol: AnyObject {
+protocol MovieDetailsViewProtocol: AnyObject, UIViewController {
     func display(_ movie: MovieDetailsModel)
     func updateNavigationTitle(_ value: String)
+    
+    func setupTrailerButton(_ isShown: Bool)
+    
+    func showAlert(_ error: NetworkError)
 }
 
 final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtocol {
@@ -33,7 +37,8 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        movieDetailsView.delegate = self
+        movieDetailsView.posterDelegate = self
+        movieDetailsView.trailerDelegate = self
         presenter.attachView(self)
         setupNavigationBar()
     }
@@ -64,6 +69,14 @@ final class MovieDetailsViewController: UIViewController, MovieDetailsViewProtoc
         movieDetailsView.set(movie)
     }
     
+    func setupTrailerButton(_ isShown: Bool) {
+        movieDetailsView.isTrailerButtonHidden(!isShown)
+    }
+    
+    func showAlert(_ error: NetworkError) {
+        showAlert(error: error)
+    }
+    
 }
 
 extension MovieDetailsViewController: MovieDetailsCallZoomViewDelegate {
@@ -73,6 +86,10 @@ extension MovieDetailsViewController: MovieDetailsCallZoomViewDelegate {
         zoomVC.modalPresentationStyle = .pageSheet
         present(zoomVC, animated: true)
     }
-    
-    
+}
+
+extension MovieDetailsViewController: MovieDetailsShowTrailerDelegate {
+    func showTrailer() {
+        presenter.showTrailer()
+    }
 }

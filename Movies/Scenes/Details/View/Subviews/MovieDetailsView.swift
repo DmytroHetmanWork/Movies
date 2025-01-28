@@ -11,6 +11,10 @@ protocol MovieDetailsCallZoomViewDelegate: AnyObject {
     func showFull(_ image: UIImage?)
 }
 
+protocol MovieDetailsShowTrailerDelegate: AnyObject {
+    func showTrailer()
+}
+
 final class MovieDetailsView: UIView {
     
     // MARK: - Views
@@ -55,6 +59,7 @@ final class MovieDetailsView: UIView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "play.circle"), for: .normal)
         button.tintColor = .black
+        button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -84,7 +89,8 @@ final class MovieDetailsView: UIView {
     
     // MARK: - Delegates
     
-    weak var delegate: MovieDetailsCallZoomViewDelegate?
+    weak var posterDelegate: MovieDetailsCallZoomViewDelegate?
+    weak var trailerDelegate: MovieDetailsShowTrailerDelegate?
     
     // MARK: - Initializers
     
@@ -114,7 +120,7 @@ final class MovieDetailsView: UIView {
     }
     
     @objc private func tappedOnImage() {
-        delegate?.showFull(imageView.image)
+        posterDelegate?.showFull(imageView.image)
     }
     
     private func addSubviews() {
@@ -185,6 +191,17 @@ final class MovieDetailsView: UIView {
         
         imageView.setImage(with: movie.imageURL!)
         
+    }
+    
+    func isTrailerButtonHidden(_ isHidden: Bool) {
+        playButton.isHidden = isHidden
+        if !isHidden {
+            playButton.addTarget(self, action: #selector(tappedOnPlay), for: .touchUpInside)
+        }
+    }
+    
+    @objc private func tappedOnPlay() {
+        trailerDelegate?.showTrailer()
     }
 
 }
