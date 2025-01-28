@@ -9,5 +9,6 @@ target 'Movies' do
   pod 'Alamofire'
   pod 'Kingfisher'
   pod 'DataCache'
+  pod 'YoutubePlayer-in-WKWebView'
 
 end
