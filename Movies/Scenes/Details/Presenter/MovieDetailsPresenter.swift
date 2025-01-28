@@ -25,7 +25,7 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
     private var networkService: AlamoNetworkingServiceProtocol
     
     var navigationTitle: String {
-        movie?.title ?? "Loading..."
+        movie?.title ?? ""
     }
     
     init(movieID: Int, networkService: AlamoNetworkingServiceProtocol) {
@@ -61,7 +61,7 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
                         }
                               
                         guard let details = try? JSONDecoder().decode(MovieDetailsDTO.self, from: data) else {
-                            completion(.failure(.failedToDecodeDetails))
+                            completion(.failure(.apiIssue))
                             return
                         }
                         

@@ -41,7 +41,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         searchBar.barStyle = .default
         searchBar.showsCancelButton = false
         searchBar.text = ""
-        searchBar.placeholder = "Search"
+        searchBar.placeholder = .localized(LocalizedKey.Title.search)
         return searchBar
     }()
     
@@ -58,7 +58,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     private let emptyTableLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.text = "No results found"
+        label.text = .localized(LocalizedKey.Title.noResultsFound)
         label.textColor = .black
         return label
     }()
@@ -222,8 +222,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         checkConnection { isConnected in
             if isConnected {
                 let alert = UIAlertController(
-                    title: "Choose Option",
-                    message: "Select sorting option for displaying desired movies",
+                    title: .localized(LocalizedKey.Title.chooseOption),
+                    message: .localized(LocalizedKey.Message.selectSorting),
                     preferredStyle: .actionSheet
                 )
                 
@@ -242,7 +242,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
                     alert.addAction(action)
                 }
                 
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: .localized(LocalizedKey.cancel), style: .cancel, handler: nil))
                 
                 present(alert, animated: true, completion: nil)
             } else {

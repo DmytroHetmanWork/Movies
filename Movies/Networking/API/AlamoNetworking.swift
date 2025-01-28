@@ -50,7 +50,7 @@ final class AlamoNetworking<T: Endpoint>: AlamoNetworkingServiceProtocol {
                     case 404, 422:
                         error = .noData
                     default:
-                        error = .networkError
+                        error = .networkError(httpResponse.statusCode)
                     }
                 }
                 completion(.error(error))

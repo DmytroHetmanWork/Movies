@@ -44,7 +44,7 @@ extension MovieDetailsDTO {
                     genre.name
                 }
                 .joined(separator: ", "),
-            rating: voteCount == 0 ? "Not rated" : String(format: "Rating %.1f", voteAverage),
+            rating: voteCount == 0 ? .none : .some(String(format: "%.1f", voteAverage)),
             posterPath: posterPath ?? "",
             originCountry: originCountry
                 .compactMap { code in

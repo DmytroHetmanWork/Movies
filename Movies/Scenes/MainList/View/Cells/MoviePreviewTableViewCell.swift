@@ -48,8 +48,6 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         
         ratingLabel.layer.cornerRadius = 4
         ratingLabel.layer.masksToBounds = true
-        
-        
     }
     
     private func setup() {
@@ -71,7 +69,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
         genresLabel.font = .systemFont(ofSize: 16, weight: .medium)
         genresLabel.textColor = .black
         
-        
+
         
         ratingLabel.font = .systemFont(ofSize: 16, weight: .medium)
         ratingLabel.backgroundColor = .black.withAlphaComponent(0.75)
@@ -121,25 +119,37 @@ final class MoviePreviewTableViewCell: UITableViewCell {
             titleYearLabelView.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
             titleYearLabelView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
             titleYearLabelView.bottomAnchor.constraint(lessThanOrEqualTo: genresLabel.topAnchor, constant: -16),
+            titleYearLabelView.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
 
 
             
             // Genres Label Constraints
             genresLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            genresLabel.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.6),
             genresLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingLabel.leadingAnchor, constant: -16),
             genresLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
+            genresLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
             
             // Rating Label Constraints
             ratingLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 90),
+//            ratingLabel.widthAnchor.constraint(equalToConstant: 100),
             ratingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
     }
 
     func config(from model: MoviePreviewModel) {
+        if model.genres.isEmpty {
+            genresLabel.isHidden = true
+        }
+        
         titleYearLabelView.label.text = "\(model.title), \(model.year)"
         genresLabel.text = model.genres
-        ratingLabel.text = model.rating
+        switch model.rating {
+        case .none:
+            ratingLabel.text = .localized(LocalizedKey.Title.notRated)
+        case .some(let value):
+            ratingLabel.text = "\(String.localized(LocalizedKey.Title.rating)): \(value)"
+        }
         
         guard let url = model.imageURL else { return }
         

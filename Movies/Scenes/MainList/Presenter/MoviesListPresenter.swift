@@ -259,8 +259,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                             DataCache.instance.write(data: encodedData, forKey: CacheItemKey.movieGenresList.rawValue)
                             completion?(.success(()))
                         } catch {
-                            print("Failed to encode genres: \(error.localizedDescription)")
-                            completion?(.failure(.failedToDecodeGenres))
+                            completion?(.failure(.apiIssue))
                         }
 
                     case .error(let networkError):

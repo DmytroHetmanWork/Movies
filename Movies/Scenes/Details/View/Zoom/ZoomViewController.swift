@@ -5,11 +5,6 @@ final class ZoomViewController: UIViewController, UIScrollViewDelegate {
     private let scrollView = UIScrollView()
     private let imageView = UIImageView()
     
-    private var firstScrollToTop = false // Flag to track first scroll to top
-    private var hasScrolledDown = false // Flag to track if the user has scrolled down by a certain threshold
-    
-    private let scrollThreshold: CGFloat = 50.0 // Threshold for a "downward scroll" action
-    
     init(image: UIImage?) {
         imageView.image = image
         super.init(nibName: nil, bundle: nil)
@@ -24,23 +19,8 @@ final class ZoomViewController: UIViewController, UIScrollViewDelegate {
         
         view.backgroundColor = .black
         
-        setupCancelButton()
         setupScrollView()
         setupImageView()
-    }
-    
-    private func setupCancelButton() {
-        let cancelButton = UIBarButtonItem(
-            title: "Cancel",
-            style: .done,
-            target: self,
-            action: #selector(cancelButtonTapped)
-        )
-        navigationItem.leftBarButtonItem = cancelButton
-    }
-    
-    @objc private func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
     }
     
     private func setupScrollView() {

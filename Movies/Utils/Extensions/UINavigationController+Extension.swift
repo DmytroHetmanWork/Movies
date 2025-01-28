@@ -14,7 +14,7 @@ extension UINavigationController {
             message: error.message,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        alert.addAction(UIAlertAction(title: .localized(LocalizedKey.Title.ok), style: .default))
         self.topViewController?.present(alert, animated: true)
     }
 }

@@ -37,6 +37,7 @@ final class MovieDetailsView: UIView {
         let label = UILabel()
         label.font = .systemFont(ofSize: 20)
         label.textColor = .darkGray
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -155,7 +156,7 @@ final class MovieDetailsView: UIView {
             
             ratingLabel.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
             ratingLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            ratingLabel.widthAnchor.constraint(equalToConstant: 80),
+            ratingLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 80),
             ratingLabel.heightAnchor.constraint(equalToConstant: 20),
             
             descriptionTextView.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 16),
@@ -173,7 +174,13 @@ final class MovieDetailsView: UIView {
         nameLabel.text = movie.title
         detailsLabel.text = movie.countryYear
         genreLabel.text = movie.genres
-        ratingLabel.text = movie.rating
+        switch movie.rating {
+        case .none:
+            ratingLabel.text = .localized(LocalizedKey.Title.notRated)
+        case .some(let value):
+            ratingLabel.text = "\(String.localized(LocalizedKey.Title.rating)): \(value)"
+        }
+        
         descriptionTextView.text = movie.description
         
         imageView.setImage(with: movie.imageURL!)

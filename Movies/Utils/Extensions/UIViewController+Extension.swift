@@ -10,7 +10,7 @@ import UIKit
 extension UIViewController {
     func showAlert(error: AlertError, okAction: (() -> Void)? = nil, completion: (() -> Void)? = nil) {
         let alertController = UIAlertController(title: error.title, message: error.message, preferredStyle: .alert)
-        let cancel = UIAlertAction(title: "OK", style: .default) { _ in
+        let cancel = UIAlertAction(title: .localized(LocalizedKey.Title.ok), style: .default) { _ in
             okAction?()
         }
         

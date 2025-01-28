@@ -8,11 +8,15 @@
 import Foundation
 
 struct MovieDetailsModel {
+    enum Rating: Hashable, Equatable, Codable {
+        case none
+        case some(String)
+    }
     
     let title: String
     let description: String
     let genres: String
-    let rating: String
+    let rating: Rating
     let posterPath: String
     let originCountry: String
     let year: String

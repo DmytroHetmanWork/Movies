@@ -37,17 +37,17 @@ extension SortMoviesOption {
     var navigationTitle: String {
         switch self {
         case .popularityDesc:
-            "Popular Movies"
+            .localized(LocalizedKey.Sorting.popularMovies)
         case .revenueDesc:
-            "Most Revenue"
+            .localized(LocalizedKey.Sorting.mostRevenue)
         case .titleAsc:
-            "Title Ascending"
+            .localized(LocalizedKey.Sorting.titleAscending)
         case .titleDesc:
-            "Title Descending"
+            .localized(LocalizedKey.Sorting.titleDescending)
         case .primaryReleaseDateAsc:
-            "Oldest Movies"
+            .localized(LocalizedKey.Sorting.oldestMovies)
         case .primaryReleaseDateDesc:
-            "Newest Movies"
+            .localized(LocalizedKey.Sorting.newestMovies)
         }
     }
     
