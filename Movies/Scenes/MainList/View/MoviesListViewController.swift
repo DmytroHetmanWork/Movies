@@ -17,6 +17,8 @@ protocol MoviesListView: AnyObject {
     func configEmptyTableState(isShowing: Bool)
     func showNetworkLostAlert()
     func showNetworkError(_ error: NetworkError)
+    
+    func updateNavigationTitle(_ title: String)
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
@@ -94,6 +96,8 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         setupLayout()
     }
     
+    // MARK: - NavigationBar
+    
     private func setupNavigationBar() {
         labelTitle.text = presenter.currentSortBy.navigationTitle
         labelTitle.textColor = .black
@@ -111,6 +115,12 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: C.sortBtnImage, style: .plain, target: self, action: #selector(tappedOnSort))
     }
+    
+    func updateNavigationTitle(_ title: String) {
+        labelTitle.text = title
+    }
+    
+    // MARK: - Layout
     
     private func setupLayout() {
         view.addSubview(searchBar)
@@ -234,6 +244,7 @@ final class MoviesListViewController: UIViewController, MoviesListView {
                         style: .default,
                         handler: { [weak self] _ in
                             self?.presenter.refreshMovies(withNewSorting: option)
+                            self?.updateNavigationTitle(option.navigationTitle)
                         }
                     )
                     if isSelected {

@@ -28,6 +28,7 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        genresLabel.isHidden = false
         backgroundImage.image = nil
         titleYearLabelView.label.text?.removeAll()
         genresLabel.text?.removeAll()
@@ -125,16 +126,20 @@ final class MoviePreviewTableViewCell: UITableViewCell {
             
             // Genres Label Constraints
             genresLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            genresLabel.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.6),
-            genresLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingLabel.leadingAnchor, constant: -16),
             genresLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
             genresLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
-            
+            genresLabel.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.6),
+
             // Rating Label Constraints
             ratingLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
 //            ratingLabel.widthAnchor.constraint(equalToConstant: 100),
+            ratingLabel.leadingAnchor.constraint(lessThanOrEqualTo: ratingLabel.trailingAnchor, constant: 16),
             ratingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
+        
+        genresLabel.setContentHuggingPriority(.required, for: .horizontal)
+        genresLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
     }
 
     func config(from model: MoviePreviewModel) {

@@ -39,10 +39,13 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     
     private var isLoadingMovies = false {
         didSet {
-            if isLoadingMovies {
-                moviesListView?.showLoadingFooter()
-            } else {
-                moviesListView?.hideLoadingFooter()
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if isLoadingMovies {
+                    moviesListView?.showLoadingFooter()
+                } else {
+                    moviesListView?.hideLoadingFooter()
+                }
             }
         }
     }
@@ -108,23 +111,30 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     }
     
     func loadMore(isRefreshing: Bool = false, _ completion: ((Result<(), NetworkError>) -> Void)? = nil) {
-        if !NetworkListener.shared.isReachable {
-            applyCachedMovies()
-        } else {
-            guard !isLoadingMovies else { return }
-            isLoadingMovies = true
-            
-            loadMovies(
-                endpoint: .discoverMovie,
-                parameters: DiscoverMoviesList(
-                    page: moviesListStatus.nextPageToLoad,
-                    sortBy: currentSortBy
-                ),
-                shouldReset: isRefreshing,
-                isSearch: false,
-                completion: completion
-            )
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if !NetworkListener.shared.isReachable {
+                showCachedItems()
+            } else {
+                DispatchQueue.global().async { [weak self] in
+                    guard let self else { return }
+                    guard !isLoadingMovies else { return }
+                    isLoadingMovies = true
+                    
+                    loadMovies(
+                        endpoint: .discoverMovie,
+                        parameters: DiscoverMoviesList(
+                            page: moviesListStatus.nextPageToLoad,
+                            sortBy: currentSortBy
+                        ),
+                        shouldReset: isRefreshing,
+                        isSearch: false,
+                        completion: completion
+                    )
+                }
+            }
         }
+        
     }
 
     func search(by text: String, isRefreshing: Bool = false, completion: @escaping (Result<(), NetworkError>) -> Void) {
@@ -173,7 +183,6 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
     func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
         if isSearching {
             resetSearchedPageStats()
-            
             search(by: queryText, isRefreshing: true, completion: { [weak self]_ in
                 self?.moviesListView.endRefreshing()
             })
@@ -185,13 +194,15 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             }
             
             loadMore(isRefreshing: true) { [weak self] result in
+                guard let self else { return }
                 switch result {
                 case .success(_):
                     break
                 case .failure(let error):
-                    self?.moviesListView.showNetworkError(error)
+                    moviesListView.showNetworkError(error)
                 }
-                self?.moviesListView.endRefreshing()
+                moviesListView.updateNavigationTitle(currentSortBy.navigationTitle)
+                moviesListView.endRefreshing()
             }
         }
     }
@@ -204,7 +215,14 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             if dataSource.diffable.snapshot().numberOfItems(inSection: currentSection) - 3 == indexPath.row {
                 if NetworkListener.shared.isReachable {
                     if isSearching {
-                        search(by: queryText, completion: { _ in })
+                        search(by: queryText, completion: { [weak self] result in
+                            switch result {
+                            case .success(_):
+                                break
+                            case .failure(let error):
+                                self?.moviesListView.showNetworkError(error)
+                            }
+                        })
                     } else {
                         loadMore()
                     }
@@ -341,6 +359,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         
         dataSource.update(with: cachedMovies, shouldReset: true)
         moviesListView.reloadData()
+        moviesListView.updateNavigationTitle(.localized(LocalizedKey.Title.cachedMovies))
     }
     
 }

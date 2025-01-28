@@ -28,14 +28,10 @@ struct MoviePreviewModel: Hashable, Codable {
         
         self.genres = dto.genreIds
             .compactMap { genreId in
-                genres.first(where: { $0.id == genreId })?.name
+                return genres.first(where: { $0.id == genreId })?.name
             }
             .joined(separator: ", ")
-        
-        if dto.voteCount == 0 {
-            self.rating = .none
-        } else {
-            self.rating = .some(String(format: "%.1f", dto.voteAverage))
-        }
+
+        self.rating = dto.voteCount == 0 ? .none : .some(String(format: "%.1f", dto.voteAverage))
     }
 }

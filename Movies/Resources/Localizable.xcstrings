@@ -239,6 +239,23 @@
         }
       }
     },
+    "title_cached_movies" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cached Movies"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кешовані фільми"
+          }
+        }
+      }
+    },
     "title_choose_option" : {
       "extractionState" : "manual",
       "localizations" : {

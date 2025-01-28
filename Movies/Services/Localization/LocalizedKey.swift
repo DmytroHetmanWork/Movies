@@ -25,6 +25,7 @@ enum LocalizedKey {
         static let ok = "title_OK"
         static let noResultsFound = "title_no_results_table"
         static let error = "title_error"
+        static let cachedMovies = "title_cached_movies"
     }
     
     enum Message {

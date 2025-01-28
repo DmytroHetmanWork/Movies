@@ -35,7 +35,7 @@ final class NetworkListener {
             }
         }
         
-        startPolling() // Polling in case `.notReachable` doesn't trigger
+        startPolling()
     }
     
     private func handleConnectionLoss() {
