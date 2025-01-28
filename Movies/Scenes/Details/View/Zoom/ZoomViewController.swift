@@ -37,36 +37,28 @@ final class ZoomViewController: UIViewController, UIScrollViewDelegate {
     private func setupImageView() {
         guard let image = imageView.image else { return }
         
-        // Calculate the size for the image view to fill the screen while maintaining aspect ratio
         let imageAspectRatio = image.size.width / image.size.height
         let screenAspectRatio = view.bounds.width / view.bounds.height
         
         var imageViewSize: CGSize
         
         if imageAspectRatio > screenAspectRatio {
-            // Image is wider than the screen
             imageViewSize = CGSize(width: view.bounds.width, height: view.bounds.width / imageAspectRatio)
         } else {
-            // Image is taller than the screen
             imageViewSize = CGSize(width: view.bounds.height * imageAspectRatio, height: view.bounds.height)
         }
         
-        // Set the image view's frame
         imageView.frame = CGRect(origin: .zero, size: imageViewSize)
         imageView.contentMode = .scaleAspectFit
         
-        // Add the image view to the scroll view
         scrollView.addSubview(imageView)
         
-        // Set the content size of the scroll view to match the image size
         scrollView.contentSize = imageView.frame.size
         
-        // Set the initial zoom scale based on the image size
         let scale = min(view.bounds.width / imageView.frame.width, view.bounds.height / imageView.frame.height)
         scrollView.minimumZoomScale = scale
         scrollView.zoomScale = scale
         
-        // Center the image view initially (only once)
         let offsetX = (scrollView.bounds.width - imageView.frame.width) / 2
         let offsetY = (scrollView.bounds.height - imageView.frame.height) / 2
         imageView.frame.origin = CGPoint(x: offsetX, y: offsetY)

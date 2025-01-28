@@ -53,11 +53,11 @@ extension UIView {
     // MARK: - Add Shimmer to Subviews
     func addShimmer(to subviews: [UIView]) {
         for subview in subviews {
-            guard shimmerViews[subview] == nil else { continue } // Avoid adding duplicate shimmer views
+            guard shimmerViews[subview] == nil else { continue }
             
             let shimmerView = ShimmerView()
             addSubview(shimmerView)
-            sendSubviewToBack(shimmerView) // Ensure it's behind all other views
+            sendSubviewToBack(shimmerView)
             
             shimmerView.translatesAutoresizingMaskIntoConstraints = false
             shimmerView.backgroundColor = .lightGray.withAlphaComponent(0.5)

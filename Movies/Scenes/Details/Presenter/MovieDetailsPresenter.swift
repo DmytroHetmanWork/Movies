@@ -38,12 +38,14 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
     
     func attachView(_ view: MovieDetailsViewProtocol) {
         self.view = view
-        loadMovieDetails { result in
+        loadMovieDetails { [weak self] result in
             switch result {
             case .success(_):
                 break
             case .failure(let failure):
-                print(failure)
+                DispatchQueue.main.async {
+                    self?.view?.showAlert(failure)
+                }
             }
         }
     }
@@ -128,6 +130,10 @@ final class MovieDetailsPresenter: MovieDetailsPresenterProtocol {
         guard let trailer else {
             view?.showAlert(.noData)
             return
+        }
+        
+        if !NetworkListener.shared.isReachable {
+            view?.showAlert(.youAreOffline)
         }
         
         didRequestTrailer?(YouTubeVideoID(value: "\(trailer.id)"))

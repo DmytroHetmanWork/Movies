@@ -26,6 +26,7 @@ final class PaddingLabelView: UIView {
     }
     
     // MARK: - Label Configuration
+    
     private func setupLabel() {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
@@ -40,6 +41,7 @@ final class PaddingLabelView: UIView {
     }
     
     // MARK: - Public API for Label Properties
+    
     var text: String? {
         get { label.text }
         set { label.text = newValue }
@@ -59,27 +61,6 @@ final class PaddingLabelView: UIView {
         get { label.textAlignment }
         set { label.textAlignment = newValue }
     }
-    
-    // MARK: - Update Padding
-    func updatePadding(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) {
-        paddingTop = top
-        paddingLeft = left
-        paddingBottom = bottom
-        paddingRight = right
-        
-        for constraint in constraints {
-            if let firstItem = constraint.firstItem as? UILabel, firstItem == label {
-                if constraint.firstAttribute == .leading {
-                    constraint.constant = paddingLeft
-                } else if constraint.firstAttribute == .trailing {
-                    constraint.constant = -paddingRight
-                } else if constraint.firstAttribute == .top {
-                    constraint.constant = paddingTop
-                } else if constraint.firstAttribute == .bottom {
-                    constraint.constant = -paddingBottom
-                }
-            }
-        }
-    }
+
 }
 

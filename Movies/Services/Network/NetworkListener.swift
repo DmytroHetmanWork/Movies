@@ -53,7 +53,6 @@ final class NetworkListener {
         connectionBackClosure?()
         print("Internet reconnected. Executing retry queue.")
         
-        // Execute and clear retryable tasks
         retryQueue.forEach { $0() }
         retryQueue.removeAll()
     }

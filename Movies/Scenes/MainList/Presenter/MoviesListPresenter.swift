@@ -59,7 +59,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         }
     }
     private var debounceTimer: Timer?
-    private let debounceDelay: TimeInterval = 0
+    private let debounceDelay: TimeInterval = 2
     
     // MARK: - Private properties
     
@@ -137,28 +137,31 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
         
     }
 
+    private var debounceWorkItem: DispatchWorkItem?
+
     func search(by text: String, isRefreshing: Bool = false, completion: @escaping (Result<(), NetworkError>) -> Void) {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
+            debounceWorkItem?.cancel()
             isSearching = false
             dataSource.resetMoviesList()
             resetSearch()
             isLoadingMovies = false
+            moviesListView.configEmptyTableState(isShowing: false)
+            moviesListView.showSearchingLoader(false)
             return
         }
+        
         if !NetworkListener.shared.isReachable {
             searchInOfflineMode(for: trimmedText)
             return
         }
-        
+
         guard !isLoadingMovies else { return }
-        isLoadingMovies = true
         
-        debounceTimer?.invalidate()
-        debounceTimer = Timer.scheduledTimer(
-            withTimeInterval: debounceDelay,
-            repeats: false
-        ) { [weak self] _ in
+        debounceWorkItem?.cancel()
+
+        let workItem = DispatchWorkItem { [weak self] in
             guard let self else { return }
             
             let isNewQueryText = queryText != trimmedText
@@ -166,7 +169,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                 resetSearchedPageStats()
                 queryText = trimmedText
             }
-            
+
             loadMovies(
                 endpoint: .searchMoive,
                 parameters: SearchMovieList(
@@ -178,7 +181,12 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                 completion: completion
             )
         }
+        
+        // Store and schedule the new task
+        debounceWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + debounceDelay, execute: workItem)
     }
+
     
     func refreshMovies(withNewSorting newSorting: SortMoviesOption?) {
         if isSearching {
@@ -191,6 +199,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
             
             if let newSorting {
                 currentSortBy = newSorting
+                moviesListView.showSearchingLoader(true)  
             }
             
             loadMore(isRefreshing: true) { [weak self] result in
@@ -201,6 +210,7 @@ final class MoviesListPresenter: MoviesListPresenterProtocol {
                 case .failure(let error):
                     moviesListView.showNetworkError(error)
                 }
+                moviesListView.showSearchingLoader(false)
                 moviesListView.updateNavigationTitle(currentSortBy.navigationTitle)
                 moviesListView.endRefreshing()
             }

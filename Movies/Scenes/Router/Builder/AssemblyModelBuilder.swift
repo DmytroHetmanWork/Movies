@@ -10,7 +10,7 @@ import UIKit
 protocol AssemblyBuilderProtocol {
     func createMoviesModule(router: RouterProtocol) -> MoviesListView
     func createMoviesDetails(by id: Int, router: RouterProtocol) -> MovieDetailsViewProtocol
-    func createTrailerPlayer(by videoID: YouTubeVideoID) -> UIViewController
+    func createTrailerPlayer(by videoID: YouTubeVideoID) -> YouTubePlayerViewController
 }
 
 final class AssemblyModelBuilder: AssemblyBuilderProtocol {
@@ -44,7 +44,7 @@ final class AssemblyModelBuilder: AssemblyBuilderProtocol {
         return view
     }
     
-    func createTrailerPlayer(by videoID: YouTubeVideoID) -> UIViewController {
+    func createTrailerPlayer(by videoID: YouTubeVideoID) -> YouTubePlayerViewController {
         let view = YouTubePlayerViewController(id: videoID)
         return view
     }

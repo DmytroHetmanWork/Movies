@@ -18,7 +18,6 @@ protocol RouterProtocol: MoviesRouter {
     func showTrailer(by id: YouTubeVideoID)
 }
 
-
 final class Router: RouterProtocol {
     
     var navigationController: UINavigationController?
@@ -30,6 +29,8 @@ final class Router: RouterProtocol {
         
         setupNetworkListener()
     }
+    
+    // MARK: - Navigation Flow
     
     func startMoviesListViewController() {
         guard let moviesListVC = assemblyBuilder?.createMoviesModule(router: self) else { return }

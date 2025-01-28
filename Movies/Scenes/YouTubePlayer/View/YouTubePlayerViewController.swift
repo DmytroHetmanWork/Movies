@@ -30,6 +30,7 @@ final class YouTubePlayerViewController: UIViewController {
         setupCloseButton()
     }
     
+    // MARK: - Player setup
 
     private func setup() {
         view.backgroundColor = .black
@@ -49,6 +50,8 @@ final class YouTubePlayerViewController: UIViewController {
             "playsinline": 1
         ])
     }
+    
+    // MARK: - Close button
     
     private func setupCloseButton() {
         let closeButton = UIButton(type: .system)

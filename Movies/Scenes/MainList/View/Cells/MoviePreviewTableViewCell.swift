@@ -80,59 +80,45 @@ final class MoviePreviewTableViewCell: UITableViewCell {
     }
     
     private func setupLayout() {
-        // Container View Setup
         containerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(containerView)
 
-        // Background Image Setup
         backgroundImage.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(backgroundImage)
         
-        // Title & Year Label Setup
         titleYearLabelView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(titleYearLabelView)
 
-        // Genres Label Setup
         genresLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(genresLabel)
 
-        // Rating Label Setup
         ratingLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(ratingLabel)
 
         // Constraints
         NSLayoutConstraint.activate([
-            // Container View Constraints
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
             
-            // Background Image Constraints
             backgroundImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             backgroundImage.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
             backgroundImage.topAnchor.constraint(equalTo: containerView.topAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-
-            // Title & Year Label Constraints
 
             titleYearLabelView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             titleYearLabelView.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
             titleYearLabelView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
             titleYearLabelView.bottomAnchor.constraint(lessThanOrEqualTo: genresLabel.topAnchor, constant: -16),
             titleYearLabelView.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
-
-
             
-            // Genres Label Constraints
             genresLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             genresLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
             genresLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
             genresLabel.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.6),
 
-            // Rating Label Constraints
             ratingLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-//            ratingLabel.widthAnchor.constraint(equalToConstant: 100),
             ratingLabel.leadingAnchor.constraint(lessThanOrEqualTo: ratingLabel.trailingAnchor, constant: 16),
             ratingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])

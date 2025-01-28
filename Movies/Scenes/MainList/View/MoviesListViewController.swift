@@ -19,6 +19,8 @@ protocol MoviesListView: AnyObject, UIViewController {
     func showNetworkError(_ error: NetworkError)
     
     func updateNavigationTitle(_ title: String)
+    
+    func showSearchingLoader(_ isShowing: Bool)
 }
 
 final class MoviesListViewController: UIViewController, MoviesListView {
@@ -63,6 +65,12 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         label.text = .localized(LocalizedKey.Title.noResultsFound)
         label.textColor = .black
         return label
+    }()
+    
+    private let loadingView = {
+        let view = LoadingView()
+        view.isHidden = true
+        return view
     }()
     
     // MARK: - Presenter
@@ -126,10 +134,13 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         view.addSubview(searchBar)
         view.addSubview(moviesTableView)
         view.addSubview(emptyTableLabel)
+        moviesTableView.addSubview(loadingView)
+        
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         moviesTableView.translatesAutoresizingMaskIntoConstraints = false
         emptyTableLabel.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -143,7 +154,12 @@ final class MoviesListViewController: UIViewController, MoviesListView {
             
             emptyTableLabel.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 50),
             emptyTableLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emptyTableLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            emptyTableLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            loadingView.topAnchor.constraint(equalTo: moviesTableView.topAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
@@ -183,6 +199,10 @@ final class MoviesListViewController: UIViewController, MoviesListView {
     
     @objc private func resignFromSearchBar() {
         searchBar.resignFirstResponder()
+    }
+    
+    func showSearchingLoader(_ isShowing: Bool) {
+        loadingView.isHidden = !isShowing
     }
     
     // MARK: - Loading flow
@@ -301,11 +321,15 @@ extension MoviesListViewController: UISearchBarDelegate {
         if searchText.isEmpty {
             searchBar.resignFirstResponder()
         }
-
+        
+        showSearchingLoader(true)
         presenter.search(
             by: searchText,
             isRefreshing: false,
-            completion: { _ in })
+            completion: { [weak self] _ in
+                print(searchText)
+                self?.showSearchingLoader(false)
+            })
     }
     
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
