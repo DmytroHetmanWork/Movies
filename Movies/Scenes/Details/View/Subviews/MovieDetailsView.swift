@@ -138,7 +138,7 @@ final class MovieDetailsView: UIView {
             imageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 9/16),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 3/4),
             
             nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
             nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),

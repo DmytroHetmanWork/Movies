@@ -96,6 +96,10 @@ final class MoviesListViewController: UIViewController, MoviesListView {
         setupDatasource()
         setupSearhBar()
     }
+    
+    override var traitCollection: UITraitCollection {
+      UITraitCollection(traitsFrom: [super.traitCollection, UITraitCollection(userInterfaceStyle: .light)])
+    }
 
     private func setupUI() {
         view.backgroundColor = .white

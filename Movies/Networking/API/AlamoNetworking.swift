@@ -19,8 +19,8 @@ protocol AlamoNetworkingServiceProtocol {
 
 final class AlamoNetworking<T: Endpoint>: AlamoNetworkingServiceProtocol {
     
-    private var host: String
-    private var headers: [String : String]
+    private let host: String
+    private let headers: [String : String]
     
     init(_ hostString: String, headers: [String : String] = [:]) {
         self.host = hostString
